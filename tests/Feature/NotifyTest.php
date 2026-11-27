@@ -189,3 +189,21 @@ it('fails the step in a run when the resolved settings are invalid', function ()
         ->and($run->step('s1')->error)->toContain('recipient');
     Notification::assertNothingSent();
 });
+
+it('sends an email when a run reaches the step', function () {
+    Flowkit::define('welcome')->trigger('core.manual')
+        ->step('s1', 'core.notify', [
+            'recipient' => '{{ employee.email }}',
+            'subject' => 'Welcome',
+            'message' => 'Hello {{ employee.name }}',
+        ])
+        ->save();
+
+    $run = Flowkit::start('welcome', ['employee' => ['email' => 'ana@example.com', 'name' => 'Ana']])->refresh();
+
+    expect($run->status)->toBe(RunStatus::Completed)
+        ->and($run->step('s1')->output)->toBe(['sent' => true, 'recipient_type' => 'email']);
+
+    Notification::assertSentOnDemand(FlowNotification::class, fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'ana@example.com');
+});
+
