@@ -3,7 +3,7 @@
 <x-flowkit::field.wrapper :field="$field" {{ $attributes }}>
     <select
         id="flowkit-field-{{ $field['name'] }}"
-        wire:model="settings.{{ $field['name'] }}"
+        wire:model{{ ($field['live'] ?? false) ? '.live' : '' }}="settings.{{ $field['name'] }}"
         class="w-full rounded-md border border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] px-3 py-2 text-sm text-[var(--flowkit-text)] focus:border-[var(--flowkit-accent)] focus:outline-none"
     >
         <option value="">{{ $field['placeholder'] ?? 'Choose…' }}</option>

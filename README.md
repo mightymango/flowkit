@@ -77,9 +77,48 @@ class Employee extends Model
 {
     use HasFlowTriggers;
 
-    protected array $flowTriggers = ['created', 'updated'];
+    protected array $flowTriggers = ['created', 'updated', 'status' => 'changed'];
 }
 ```
+
+Plain entries (`created`, `updated`, `deleted`) fire on those model events. Without `$flowTriggers`, a model fires `created` and `updated`. The model's attributes are in the payload under its snake-cased class name, e.g. `employee.department`; override `toFlowPayload()` to limit what flows see.
+
+An `'attribute' => 'changed'` entry watches that attribute: whenever an update changes it, the model fires a `changed` event with the old and new values under `changes`:
+
+```json
+{
+  "employee": { "id": 7, "name": "Ana", "status": "leaver" },
+  "event": "changed",
+  "changes": { "status": { "from": "active", "to": "leaver" } }
+}
+```
+
+Enum casts are reduced to their value and dates to ISO 8601 strings. To start a flow when an employee becomes a leaver, set the `core.model-event` trigger to:
+
+```php
+->trigger('core.model-event', [
+    'model' => Employee::class,
+    'event' => 'changed',
+    'attribute' => 'status',   // must be watched in $flowTriggers
+    'from' => null,            // optional: only when the old value is this
+    'to' => 'leaver',          // optional: only when the new value is this
+])
+```
+
+An empty `from` or `to` matches any value; values are compared as strings. A trigger whose settings fail validation never matches.
+
+### Scheduled flows
+
+The `core.schedule` trigger starts a flow on a cron expression, such as `0 9 * * 1` for 9am every Monday, with an optional time zone (the app's by default). The run gets `schedule.scheduled_at` and `schedule.timezone`.
+
+Schedule the tick command once in your app; it starts every live, unpaused flow that is due:
+
+```php
+// routes/console.php
+Schedule::command('flowkit:tick')->everyMinute();
+```
+
+It's safe to run on several servers or to let ticks overlap: each flow is claimed for a minute with an atomic update to `flows.last_scheduled_at`, so it starts once. Missed minutes (if the scheduler was down) aren't caught up.
 
 ### Expressions
 
@@ -119,7 +158,24 @@ class SendTeamsMessage extends Action
 
 Bricks in `app/Flows` are discovered automatically; others can be listed in `config/flowkit.php`.
 
-Core bricks: `core.manual`, `core.model-event`, `core.branch`, `core.wait`, `core.set-variable`.
+### Conditions
+
+A `Condition` brick returns true or false. Use one in two ways:
+
+- **In a branch**, instead of an expression. The branch's settings name the condition and hold its own settings under `condition_settings`. In the editor, pick it from the branch's **Check** list.
+- **As a step on its own**, as a filter. If it's false, the run stops there and completes without running the steps after it. The step's output is `{"passed": false, "stopped": true}`.
+
+```php
+Flowkit::define('managers')
+    ->trigger('core.manual')
+    ->branchOn('s1', 'app.is-manager', ['team' => '{{ employee.team }}'],
+        yes: fn ($b) => $b->step('s2', 'core.set-variable', ['value' => 'manager']),
+    )
+    ->step('s3', 'app.is-active', [])   // stops the run if false
+    ->save();
+```
+
+Core bricks: `core.manual`, `core.model-event`, `core.schedule`, `core.branch`, `core.wait`, `core.set-variable`.
 
 ## Customisation
 
@@ -191,7 +247,7 @@ composer test
 
 | Phase | Scope | In this scaffold |
 | --- | --- | --- |
-| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | ✅ Mostly, including `Flowkit::fake()` and `runFlow()` test helpers. Durable resume after `core.wait` is still to do |
+| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | ✅ Mostly, including scheduled triggers and the `Flowkit::fake()` and `runFlow()` test helpers. Durable resume after `core.wait` is still to do |
 | 2. Editor | Step-list editor, settings from fields, run history, dry-run testing | 🟡 Editor and dry runs; run history UI and `wire:sort` reordering to do |
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | ⬜ Config hooks only |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, prop docs | 🟡 Publish and tokens; `flowkit:outdated` to do |

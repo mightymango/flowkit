@@ -7,6 +7,7 @@ use MightyMango\Flowkit\Bricks\Core;
 use MightyMango\Flowkit\Console\MakeBrickCommand;
 use MightyMango\Flowkit\Console\PublishCommand;
 use MightyMango\Flowkit\Console\RunCommand;
+use MightyMango\Flowkit\Console\TickCommand;
 use MightyMango\Flowkit\Engine\Expression;
 use MightyMango\Flowkit\Engine\Runner;
 use MightyMango\Flowkit\Livewire\FlowEditor;
@@ -23,6 +24,7 @@ class FlowkitServiceProvider extends ServiceProvider
     public const CORE_BRICKS = [
         Core\Manual::class,
         Core\ModelEvent::class,
+        Core\Schedule::class,
         Core\Branch::class,
         Core\Wait::class,
         Core\SetVariable::class,
@@ -58,7 +60,7 @@ class FlowkitServiceProvider extends ServiceProvider
         $this->registerGate();
 
         if ($this->app->runningInConsole()) {
-            $this->commands([PublishCommand::class, MakeBrickCommand::class, RunCommand::class]);
+            $this->commands([PublishCommand::class, MakeBrickCommand::class, RunCommand::class, TickCommand::class]);
 
             $this->publishes([
                 __DIR__.'/../config/flowkit.php' => config_path('flowkit.php'),

@@ -28,6 +28,8 @@ abstract class Field implements Arrayable
 
     protected mixed $default = null;
 
+    protected bool $live = false;
+
     final public function __construct(public readonly string $name)
     {
         $this->label = Str::headline($name);
@@ -100,6 +102,14 @@ abstract class Field implements Arrayable
         return $this;
     }
 
+    /** Update the editor as soon as the value changes, e.g. to show dependent fields. */
+    public function live(bool $live = true): static
+    {
+        $this->live = $live;
+
+        return $this;
+    }
+
     public function getRules(): array
     {
         return array_merge([$this->required ? 'required' : 'nullable'], $this->baseRules(), $this->rules);
@@ -122,6 +132,7 @@ abstract class Field implements Arrayable
             'default' => $this->default,
             'supportsVariables' => $this->supportsVariables,
             'variableType' => $this->variableType,
+            'live' => $this->live,
         ];
     }
 }

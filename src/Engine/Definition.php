@@ -107,6 +107,12 @@ final class Definition implements Arrayable, JsonSerializable
                     $errors[] = "Unknown brick [{$step['brick']}] at {$where}.";
                 }
 
+                $condition = $step['settings']['condition'] ?? null;
+                if (is_string($condition) && $condition !== ''
+                    && ! array_key_exists($condition, $bricks->all('condition'))) {
+                    $errors[] = "Unknown condition [{$condition}] at {$where}.";
+                }
+
                 foreach ($step['branches'] ?? [] as $name => $children) {
                     $walk($children, "{$where}.branches.{$name}");
                 }
