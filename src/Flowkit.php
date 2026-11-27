@@ -2,6 +2,7 @@
 
 namespace MightyMango\Flowkit;
 
+use Illuminate\Support\Str;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Engine\FlowBuilder;
 use MightyMango\Flowkit\Engine\Runner;
@@ -9,7 +10,6 @@ use MightyMango\Flowkit\Enums\RunStatus;
 use MightyMango\Flowkit\Jobs\RunFlow;
 use MightyMango\Flowkit\Models\Flow;
 use MightyMango\Flowkit\Models\FlowRun;
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class Flowkit

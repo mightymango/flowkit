@@ -2,16 +2,16 @@
 
 namespace MightyMango\Flowkit\Livewire;
 
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use Livewire\Attributes\Locked;
+use Livewire\Component;
 use MightyMango\Flowkit\Bricks\Brick;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\Branch;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 use MightyMango\Flowkit\Models\Flow;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Livewire\Attributes\Locked;
-use Livewire\Component;
 
 /**
  * Loads a flow's draft version, holds the step tree, and adds, moves,

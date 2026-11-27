@@ -1,5 +1,9 @@
 # Flowkit
 
+[![tests](https://github.com/mightymango/flowkit/actions/workflows/tests.yml/badge.svg)](https://github.com/mightymango/flowkit/actions/workflows/tests.yml)
+[![quality](https://github.com/mightymango/flowkit/actions/workflows/quality.yml/badge.svg)](https://github.com/mightymango/flowkit/actions/workflows/quality.yml)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE.md)
+
 A Zapier-style workflow builder for Laravel Livewire apps.
 
 It has three layers:
@@ -287,7 +291,9 @@ Flowkit::assertNothingRetried();
 
 ```bash
 composer install
-composer test
+composer test        # Pest
+composer lint        # Pint: fix code style (composer lint -- --test to check only)
+composer analyse     # Larastan, level 5
 ```
 
 ## Roadmap

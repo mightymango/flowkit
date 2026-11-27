@@ -2,11 +2,11 @@
 
 namespace MightyMango\Flowkit\Console;
 
+use Illuminate\Console\Command;
 use MightyMango\Flowkit\Bricks\Action;
 use MightyMango\Flowkit\Enums\RunStatus;
 use MightyMango\Flowkit\Flowkit;
 use MightyMango\Flowkit\Models\FlowRun;
-use Illuminate\Console\Command;
 
 class RetryCommand extends Command
 {

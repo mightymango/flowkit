@@ -12,9 +12,11 @@ A Zapier-style workflow builder package for Laravel Livewire apps: `mightymango/
 composer install
 composer test          # Pest, via Orchestra Testbench (sqlite in memory)
 vendor/bin/pest --filter=RunnerTest
+composer lint          # Pint (Laravel preset)
+composer analyse       # Larastan, level 5 (phpstan.neon.dist)
 ```
 
-CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.5 against Laravel 12 and 13 with Livewire 4 (Laravel 13 needs PHP 8.3+). Keep it green. If Packagist isn't reachable from your environment, push a branch and read the Actions results instead.
+CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.5 against Laravel 12 and 13 with Livewire 4 (Laravel 13 needs PHP 8.3+); `.github/workflows/quality.yml` runs Pint and Larastan. Keep both green. If Packagist isn't reachable from your environment, push a branch and read the Actions results instead.
 
 ## Architecture
 

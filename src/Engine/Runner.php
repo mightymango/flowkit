@@ -2,6 +2,8 @@
 
 namespace MightyMango\Flowkit\Engine;
 
+use Illuminate\Support\Facades\Validator;
+use LogicException;
 use MightyMango\Flowkit\Bricks\Action;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Condition;
@@ -13,8 +15,6 @@ use MightyMango\Flowkit\Events\StepFinished;
 use MightyMango\Flowkit\Jobs\RunFlow;
 use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
-use Illuminate\Support\Facades\Validator;
-use LogicException;
 use Throwable;
 
 /**
@@ -47,7 +47,7 @@ class Runner
 
     public function execute(FlowRun $run): FlowRun
     {
-        if ($run->status?->isFinished()) {
+        if ($run->status->isFinished()) {
             return $run;
         }
 
@@ -95,7 +95,7 @@ class Runner
      * Run a list of steps in order. Stops early if a step waits, fails or
      * will be retried, or a standalone condition fails.
      *
-     * @param  array<string, FlowRunStep>  $history
+     * @param  array<array-key, FlowRunStep>  $history
      */
     private function walk(array $steps, Context $context, FlowRun $run, array $history, ?int &$retry): RunStatus|string
     {
@@ -111,7 +111,7 @@ class Runner
     }
 
     /**
-     * @param  array<string, FlowRunStep>  $history
+     * @param  array<array-key, FlowRunStep>  $history
      */
     private function runStep(array $step, Context $context, FlowRun $run, array $history, ?int &$retry): RunStatus|string
     {
@@ -132,7 +132,7 @@ class Runner
             'step_id' => $step['id'],
             'brick' => $step['brick'],
             'status' => RunStatus::Running,
-            'attempt' => ($previous?->attempt ?? 0) + 1,
+            'attempt' => $previous ? $previous->attempt + 1 : 1,
         ]);
         $record->run()->associate($run);
         $brick = null;

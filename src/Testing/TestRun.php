@@ -36,7 +36,7 @@ class TestRun
     {
         PHPUnit::assertSame(
             $status, $this->run->status,
-            "Expected the run to be [{$status->value}] but it is [{$this->run->status?->value}]."
+            "Expected the run to be [{$status->value}] but it is [{$this->run->status->value}]."
         );
 
         return $this;
@@ -74,7 +74,7 @@ class TestRun
 
         PHPUnit::assertSame(
             $status, $step->status,
-            "Expected step [{$stepId}] to be [{$status->value}] but it is [{$step->status?->value}]."
+            "Expected step [{$stepId}] to be [{$status->value}] but it is [{$step->status->value}]."
             .($step->error ? " Error: {$step->error}" : '')
         );
 

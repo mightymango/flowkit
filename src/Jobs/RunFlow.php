@@ -2,13 +2,13 @@
 
 namespace MightyMango\Flowkit\Jobs;
 
-use MightyMango\Flowkit\Engine\Runner;
-use MightyMango\Flowkit\Models\FlowRun;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use MightyMango\Flowkit\Engine\Runner;
+use MightyMango\Flowkit\Models\FlowRun;
 
 class RunFlow implements ShouldQueue
 {

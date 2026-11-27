@@ -2,10 +2,10 @@
 
 namespace MightyMango\Flowkit\Livewire;
 
-use MightyMango\Flowkit\Models\Flow;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use MightyMango\Flowkit\Models\Flow;
 
 class FlowList extends Component
 {

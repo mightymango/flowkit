@@ -1,5 +1,6 @@
 <?php
 
+use Livewire\Livewire;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Engine\FlowBuilder;
 use MightyMango\Flowkit\Enums\RunStatus;
@@ -7,7 +8,6 @@ use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 use MightyMango\Flowkit\Facades\Flowkit;
 use MightyMango\Flowkit\Livewire\FlowEditor;
 use MightyMango\Flowkit\Models\Flow;
-use Livewire\Livewire;
 
 function managerFlow()
 {

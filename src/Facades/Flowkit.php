@@ -2,9 +2,9 @@
 
 namespace MightyMango\Flowkit\Facades;
 
+use Illuminate\Support\Facades\Facade;
 use MightyMango\Flowkit\Testing\FlowkitFake;
 use MightyMango\Flowkit\TriggerDispatcher;
-use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \MightyMango\Flowkit\Bricks\BrickRegistry bricks()
@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Illuminate\Support\Collection retried()
  *
  * @see \MightyMango\Flowkit\Flowkit
- * @see \MightyMango\Flowkit\Testing\FlowkitFake
+ * @see FlowkitFake
  */
 class Flowkit extends Facade
 {

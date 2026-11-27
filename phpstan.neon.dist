@@ -1,0 +1,28 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+    paths:
+        - src
+        - config
+        - database
+    databaseMigrationsPath:
+        - database/migrations
+    tmpDir: build/phpstan
+
+    ignoreErrors:
+        # This is the package's own config file; it's merged into the app's
+        # config, so env() here is read before the config is cached.
+        -
+            identifier: larastan.noEnvCallsOutsideOfConfig
+            path: config/flowkit.php
+        # Used by host-app models, not inside the package.
+        -
+            identifier: trait.unused
+            path: src/Concerns/HasFlowTriggers.php
+        # flowkit:: views are registered by the service provider at runtime,
+        # so Larastan can't resolve them when analysing the package alone.
+        -
+            message: '#^Parameter \#1 \$view of function view expects view-string\|null, string given\.$#'
+            path: src/Livewire/*

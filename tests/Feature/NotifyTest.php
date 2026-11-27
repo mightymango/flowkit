@@ -206,4 +206,3 @@ it('sends an email when a run reaches the step', function () {
 
     Notification::assertSentOnDemand(FlowNotification::class, fn ($notification, $channels, $notifiable) => $notifiable->routes['mail'] === 'ana@example.com');
 });
-

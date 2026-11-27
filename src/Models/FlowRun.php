@@ -2,15 +2,28 @@
 
 namespace MightyMango\Flowkit\Models;
 
-use MightyMango\Flowkit\Enums\RunStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
+use MightyMango\Flowkit\Enums\RunStatus;
 
 /**
  * A run always points at a version, never at the flow, so editing a flow
  * never changes a run that is already under way.
+ *
+ * @property int $id
+ * @property int $flow_version_id
+ * @property string $correlation_id
+ * @property array<string, mixed>|null $payload
+ * @property array<string, mixed>|null $context
+ * @property RunStatus $status
+ * @property bool $dry_run
+ * @property Carbon|null $started_at
+ * @property Carbon|null $finished_at
+ * @property-read FlowVersion $version
  */
 class FlowRun extends Model
 {
@@ -27,11 +40,13 @@ class FlowRun extends Model
         'finished_at' => 'datetime',
     ];
 
+    /** @return BelongsTo<FlowVersion, $this> */
     public function version(): BelongsTo
     {
         return $this->belongsTo(FlowVersion::class, 'flow_version_id');
     }
 
+    /** @return HasMany<FlowRunStep, $this> */
     public function steps(): HasMany
     {
         return $this->hasMany(FlowRunStep::class)->orderBy('id');
@@ -49,7 +64,10 @@ class FlowRun extends Model
      * Run history can contain personal data, so it is pruned after the
      * configured retention period by `php artisan model:prune`.
      */
-    public function prunable()
+    /**
+     * @return Builder<FlowRun>
+     */
+    public function prunable(): Builder
     {
         return static::where('created_at', '<=', now()->subDays(config('flowkit.retention_days', 90)));
     }

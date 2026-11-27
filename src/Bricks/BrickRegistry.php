@@ -2,10 +2,10 @@
 
 namespace MightyMango\Flowkit\Bricks;
 
-use MightyMango\Flowkit\Exceptions\UnknownBrick;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use MightyMango\Flowkit\Exceptions\UnknownBrick;
 use ReflectionClass;
 use Symfony\Component\Finder\Finder;
 

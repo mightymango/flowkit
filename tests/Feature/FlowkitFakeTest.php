@@ -5,9 +5,9 @@ use MightyMango\Flowkit\Facades\Flowkit;
 use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
 use MightyMango\Flowkit\Testing\FlowkitFake;
-use MightyMango\Flowkit\TriggerDispatcher;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\Flaky;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\SendMessage;
+use MightyMango\Flowkit\TriggerDispatcher;
 use PHPUnit\Framework\AssertionFailedError;
 
 beforeEach(function () {
@@ -22,7 +22,7 @@ it('swaps the facade and the container binding for a fake', function () {
 
     expect($fake)->toBeInstanceOf(FlowkitFake::class)
         ->and(Flowkit::getFacadeRoot())->toBe($fake)
-        ->and(app(\MightyMango\Flowkit\Flowkit::class))->toBe($fake);
+        ->and(app(MightyMango\Flowkit\Flowkit::class))->toBe($fake);
 });
 
 it('records starts without running them', function () {
@@ -175,4 +175,3 @@ it('records a retry from the command line under the fake', function () {
     Flowkit::assertRetried($run);
     expect(Flaky::$calls)->toBe(1);
 });
-

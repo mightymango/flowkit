@@ -2,8 +2,8 @@
 
 namespace MightyMango\Flowkit\Engine;
 
-use MightyMango\Flowkit\Models\Flow;
 use Closure;
+use MightyMango\Flowkit\Models\Flow;
 
 /**
  * Code-first flows: builds the same definition JSON the editor produces.

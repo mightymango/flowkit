@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Event;
 use MightyMango\Flowkit\Engine\FlowBuilder;
 use MightyMango\Flowkit\Enums\RunStatus;
 use MightyMango\Flowkit\Events\RunFinished;
@@ -7,7 +8,6 @@ use MightyMango\Flowkit\Events\RunStarted;
 use MightyMango\Flowkit\Events\StepFinished;
 use MightyMango\Flowkit\Facades\Flowkit;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\Flaky;
-use Illuminate\Support\Facades\Event;
 
 it('fires events as a run starts, takes each step and finishes', function () {
     Event::fake([RunStarted::class, StepFinished::class, RunFinished::class]);

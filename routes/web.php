@@ -1,7 +1,7 @@
 <?php
 
-use MightyMango\Flowkit\Models\Flow;
 use Illuminate\Support\Facades\Route;
+use MightyMango\Flowkit\Models\Flow;
 
 Route::get('/', fn () => view('flowkit::pages.index'))->name('index');
 

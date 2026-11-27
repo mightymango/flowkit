@@ -1,9 +1,9 @@
 <?php
 
+use Livewire\Livewire;
 use MightyMango\Flowkit\Livewire\FlowEditor;
 use MightyMango\Flowkit\Livewire\FlowList;
 use MightyMango\Flowkit\Models\Flow;
-use Livewire\Livewire;
 
 it('lists flows', function () {
     Flow::create(['key' => 'onboarding', 'name' => 'Onboarding']);
