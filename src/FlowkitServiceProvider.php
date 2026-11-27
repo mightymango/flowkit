@@ -84,7 +84,10 @@ class FlowkitServiceProvider extends ServiceProvider
         Blade::anonymousComponentPath(resource_path('views/flowkit'), 'flowkit');
         Blade::anonymousComponentPath(__DIR__.'/../resources/views/components', 'flowkit');
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'flowkit');
+        // Pages, layouts and Livewire views. Kept apart from components/ so
+        // Laravel's `flowkit::components.*` guess can't shadow the app's
+        // overrides.
+        $this->loadViewsFrom(__DIR__.'/../resources/views/app', 'flowkit');
     }
 
     /**
