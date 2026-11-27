@@ -28,7 +28,10 @@
         "psr-4": {
             "MightyMango\\Flowkit\\": "src/",
             "MightyMango\\Flowkit\\Database\\": "database/"
-        }
+        },
+        "files": [
+            "src/Testing/functions.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

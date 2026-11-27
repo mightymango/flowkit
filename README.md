@@ -64,6 +64,7 @@ Flowkit::define('new-starter')
     ->save();
 
 Flowkit::start('new-starter', ['employee' => $employee->toArray()]);
+Flowkit::run('new-starter', $payload);  // runs now, in this process, not on the queue
 Flowkit::test('new-starter', $payload); // unsafe actions run in dry-run mode
 ```
 
@@ -133,6 +134,54 @@ Core bricks: `core.manual`, `core.model-event`, `core.branch`, `core.wait`, `cor
 
 ## Testing
 
+### Testing your flows
+
+`Flowkit::fake()` works like `Queue::fake()`. Flows started with `Flowkit::start()`, `Flowkit::test()` or a model trigger are recorded as pending runs and never executed, so you can assert that your code started the right flow without any actions running:
+
+```php
+use MightyMango\Flowkit\Facades\Flowkit;
+
+Flowkit::fake();
+
+Employee::create(['name' => 'Ana', 'department' => 'Delivery']);
+
+Flowkit::assertStarted('new-starter');
+Flowkit::assertStarted('new-starter', fn (array $payload, FlowRun $run) => $payload['employee']['name'] === 'Ana');
+Flowkit::assertStartedTimes('new-starter', 1);
+Flowkit::assertNotStarted('leaver');
+Flowkit::assertNothingStarted();
+```
+
+To test what a flow does, run it with `runFlow()`. It runs the flow straight away, in the test's process, whatever your queue driver, and returns the run with assertions:
+
+```php
+runFlow('new-starter', ['employee' => ['name' => 'Ana', 'department' => 'Delivery']])
+    ->assertCompleted()                 // or assertFailed(), assertWaiting()
+    ->assertStepsRan(['s1', 's2', 's4'])
+    ->assertStepCompleted('s2')         // or assertStepSkipped(), assertStepFailed('s2', 'error text'), assertStepWaiting()
+    ->assertStepNotReached('s3')
+    ->assertStepOutput('s1', 'branch', 'yes');
+
+runFlow('new-starter', $payload, dryRun: true); // unsafe actions run in dry-run mode
+```
+
+Runs started with `runFlow()` or `Flowkit::run()` still execute under the fake, and the fake records every action they reach:
+
+```php
+Flowkit::fake();
+
+runFlow('new-starter', $payload);
+
+Flowkit::assertActionRan('teams.message');
+Flowkit::assertActionRan('teams.message', fn (array $input, array $output) => $input['to'] === 'delivery-lead');
+Flowkit::assertActionRanTimes('teams.message', 1);
+Flowkit::assertActionNotRan('hr.update-record');
+```
+
+The callback gets the step's resolved settings, its output and the `FlowRunStep`. Unsafe actions in a dry run don't count as having run. The helpers use plain PHPUnit assertions, so they work with Pest or PHPUnit; `runFlow()` is autoloaded with the package and is skipped if your app already defines a function of that name (use `new MightyMango\Flowkit\Testing\TestRun(Flowkit::run(...))` instead).
+
+### Testing the package
+
 ```bash
 composer install
 composer test
@@ -142,7 +191,7 @@ composer test
 
 | Phase | Scope | In this scaffold |
 | --- | --- | --- |
-| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | ✅ Mostly. Durable resume after `core.wait` is still to do |
+| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | ✅ Mostly, including `Flowkit::fake()` and `runFlow()` test helpers. Durable resume after `core.wait` is still to do |
 | 2. Editor | Step-list editor, settings from fields, run history, dry-run testing | 🟡 Editor and dry runs; run history UI and `wire:sort` reordering to do |
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | ⬜ Config hooks only |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, prop docs | 🟡 Publish and tokens; `flowkit:outdated` to do |
