@@ -43,6 +43,15 @@ abstract class Brick
         return $rules;
     }
 
+    /**
+     * The rules for a given set of settings. Override when some rules depend
+     * on other settings, e.g. a branch adds its chosen condition's rules.
+     */
+    public function rulesFor(array $settings): array
+    {
+        return $this->rules();
+    }
+
     abstract public static function type(): string;
 
     public static function meta(): array
