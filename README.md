@@ -147,7 +147,7 @@ composer test
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | ⬜ Config hooks only |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, prop docs | 🟡 Publish and tokens; `flowkit:outdated` to do |
 
-Work is tracked as GitHub issues under four phase milestones. Open questions are in [docs/plan.md](docs/plan.md): Teams/Graph sign-off and whether to borrow from AutoBuilder. Settled decisions are recorded under [Decisions](docs/plan.md#decisions).
+Work is tracked as GitHub issues under four phase milestones. The one open question, Teams/Graph sign-off, is in [docs/plan.md](docs/plan.md). Settled decisions are recorded under [Decisions](docs/plan.md#decisions).
 
 ## Licence
 

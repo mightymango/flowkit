@@ -67,7 +67,7 @@ The engine runs a versioned JSON flow definition against a context, one step at 
 | `flow_runs` | Flow version, trigger payload, status, start and finish times, correlation ID |
 | `flow_run_steps` | Step ID, input, output, status, error, duration, attempt number |
 
-Runs always point at a version, never at the flow. Editing a flow creates a new draft version, so runs already in progress finish on the definition they started with. This is the main thing AutoBuilder doesn't appear to handle.
+Runs always point at a version, never at the flow. Editing a flow creates a new draft version, so runs already in progress finish on the definition they started with. AutoBuilder doesn't do this: its runs point at the flow, which is edited in place.
 
 **Definition shape.** A flow is a trigger plus an ordered list of steps. A branch step holds named child lists, e.g. `yes` and `otherwise`, which maps directly onto the step-list UI.
 
@@ -222,7 +222,6 @@ Phases 1 and 2 deliver something usable inside a host app on their own. Phases 3
 **Open questions**
 
 - Teams messaging through Microsoft Graph needs an Entra app registration and data-protection sign-off before phase 1's notification brick.
-- Whether to fork AutoBuilder's engine (MIT) as a starting point, or start fresh and use it only as a reference.
 
 ## Decisions
 
@@ -242,4 +241,21 @@ Our engine already persists the step tree and pins each run to a version, so res
 All of this sits behind a `WaitScheduler` interface, so a library adapter can be added later if needed. It's built in the phase 3 durable-waits issue.
 
 **Licence: open source, MIT** (#3, 27 Nov 2026). Published on Packagist as `mightymango/flowkit`. The README is the public documentation.
+
+**AutoBuilder and Drawflow: we use neither** (#4, 27 Nov 2026). We don't fork or copy code from either.
+
+- **AutoBuilder** (`grazulex/laravel-autobuilder`, MIT) has a Vue editor rather than Livewire, needs PHP 8.4 or later, and stores flows as a node-and-edge graph. It has no versions and no per-step records. Its waits don't resume. It retries actions that aren't safe to repeat, with no idempotency keys, and it resolves any class named in the stored JSON. Its `ExecuteCode` and `CustomClosure` bricks run `eval` on PHP typed in the editor.
+- **Drawflow** (`jerosoler/Drawflow`, MIT) is a vanilla-JS canvas for wiring nodes together, not an engine. It doesn't fit the step-list editor in `docs/mockup.html`, and its last release was 0.0.60 in September 2024.
+
+AutoBuilder has some ideas worth rebuilding in our own model, each as its own issue when we get to it:
+
+- Replay a failed run from the step that failed, as a new run on the same version, reusing the earlier steps' outputs.
+- Retry attempts and delay that a step can override, defaulting from the brick and then config. A retry is re-dispatched with a delay rather than sleeping in the worker, and only happens when `$retrySafe` is true.
+- `visibleWhen()` on fields, for settings that depend on other settings.
+- A `samplePayload()` on triggers, for test runs in the editor.
+- Validate a flow before it's published: it has a trigger, no step IDs are duplicated, and required settings are filled.
+- Cache which flows are live for registering triggers, and skip registering triggers when the tables aren't migrated yet.
+- Bricks to consider later: sub-flow, loop over a list, switch, throttle, and a webhook trigger signed with an HMAC.
+
+If we ever copy AutoBuilder code, we must keep its notice ("Copyright (c) 2025 Jean-Marc Strauven") and the MIT licence text with it.
 
