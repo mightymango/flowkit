@@ -131,6 +131,23 @@ class SendTeamsMessage extends Action
 
 Bricks in `app/Flows` are discovered automatically; others can be listed in `config/flowkit.php`.
 
+### Conditions
+
+A `Condition` brick returns true or false. Use one in two ways:
+
+- **In a branch**, instead of an expression. The branch's settings name the condition and hold its own settings under `condition_settings`. In the editor, pick it from the branch's **Check** list.
+- **As a step on its own**, as a filter. If it's false, the run stops there and completes without running the steps after it. The step's output is `{"passed": false, "stopped": true}`.
+
+```php
+Flowkit::define('managers')
+    ->trigger('core.manual')
+    ->branchOn('s1', 'app.is-manager', ['team' => '{{ employee.team }}'],
+        yes: fn ($b) => $b->step('s2', 'core.set-variable', ['value' => 'manager']),
+    )
+    ->step('s3', 'app.is-active', [])   // stops the run if false
+    ->save();
+```
+
 Core bricks: `core.manual`, `core.model-event`, `core.schedule`, `core.branch`, `core.wait`, `core.set-variable`.
 
 ## Customisation

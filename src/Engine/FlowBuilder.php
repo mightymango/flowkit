@@ -67,6 +67,27 @@ class FlowBuilder
         return $this;
     }
 
+    /**
+     * A branch that tests a Condition brick rather than an expression.
+     *
+     * @param  Closure(FlowBuilder): mixed|null  $yes
+     * @param  Closure(FlowBuilder): mixed|null  $otherwise
+     */
+    public function branchOn(string $id, string $condition, array $settings = [], ?Closure $yes = null, ?Closure $otherwise = null): self
+    {
+        $this->steps[] = [
+            'id' => $id,
+            'brick' => 'core.branch',
+            'settings' => ['condition' => $condition, 'condition_settings' => $settings],
+            'branches' => [
+                'yes' => $this->nested($yes),
+                'otherwise' => $this->nested($otherwise),
+            ],
+        ];
+
+        return $this;
+    }
+
     public function toDefinition(): Definition
     {
         return new Definition($this->trigger, $this->steps);

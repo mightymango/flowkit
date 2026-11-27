@@ -2,11 +2,13 @@
 
 namespace MightyMango\Flowkit\Livewire;
 
+use MightyMango\Flowkit\Bricks\Brick;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\Branch;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 use MightyMango\Flowkit\Models\Flow;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -130,12 +132,22 @@ class FlowEditor extends Component
             return;
         }
 
-        $rules = [];
-        foreach (app(BrickRegistry::class)->resolve($node['brick'])->rules() as $name => $rule) {
-            $rules["settings.{$name}"] = $rule;
+        // Validate the settings on their own, exactly as the runner does, so
+        // rules that refer to other settings (e.g. required_without) resolve.
+        $this->resetValidation();
+        $validator = Validator::make($this->settings, app(BrickRegistry::class)->resolve($node['brick'])->rulesFor($this->settings));
+
+        if ($validator->fails()) {
+            foreach ($validator->errors()->messages() as $key => $messages) {
+                foreach ($messages as $message) {
+                    $this->addError("settings.{$key}", $message);
+                }
+            }
+
+            return;
         }
 
-        $validated = $rules ? ($this->validate($rules)['settings'] ?? []) : [];
+        $validated = $validator->validated();
 
         if ($this->selected === 'trigger') {
             $this->trigger['settings'] = $validated;
@@ -192,8 +204,26 @@ class FlowEditor extends Component
             'stepBricks' => array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition')),
             'labels' => array_map(fn ($class) => $class::$label, $registry->all()),
             'selectedBrick' => $brick,
-            'fields' => $brick ? array_map(fn ($field) => $field->toArray(), $brick->fields()) : [],
+            'fields' => $brick ? $this->fieldsFor($brick) : [],
         ]);
+    }
+
+    /**
+     * The selected brick's fields for the settings panel. A branch that uses
+     * a Condition brick also shows that condition's fields, stored under
+     * `condition_settings`.
+     */
+    private function fieldsFor(Brick $brick): array
+    {
+        $fields = array_map(fn ($field) => $field->toArray(), $brick->fields());
+
+        if ($brick instanceof Branch) {
+            foreach ($brick->conditionFields($this->settings) as $field) {
+                $fields[] = ['name' => "condition_settings.{$field->name}"] + $field->toArray();
+            }
+        }
+
+        return $fields;
     }
 
     private function assertBrick(string $key, ?string $type = null): void
