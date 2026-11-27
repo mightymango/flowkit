@@ -37,20 +37,24 @@ it('runs a code-first flow down the matching branch', function () {
 it('takes the otherwise branch', function () {
     newStarterFlow();
 
-    $run = Flowkit::start('new-starter', ['employee' => ['name' => 'Bo', 'department' => 'Sales']])->refresh();
+    runFlow('new-starter', ['employee' => ['name' => 'Bo', 'department' => 'Sales']])
+        ->assertCompleted()
+        ->assertStepsRan(['s1', 's3', 's4'])
+        ->assertStepOutput('s1', 'branch', 'otherwise')
+        ->assertStepNotReached('s2');
 
-    expect($run->steps->pluck('step_id')->all())->toBe(['s1', 's3', 's4'])
-        ->and(SendMessage::$sent)->toBeEmpty();
+    expect(SendMessage::$sent)->toBeEmpty();
 });
 
 it('does not call unsafe actions in a dry run', function () {
     newStarterFlow();
 
-    $run = Flowkit::test('new-starter', ['employee' => ['name' => 'Ana', 'department' => 'Delivery']])->refresh();
+    runFlow('new-starter', ['employee' => ['name' => 'Ana', 'department' => 'Delivery']], dryRun: true)
+        ->assertCompleted()
+        ->assertStepCompleted('s2')
+        ->assertStepOutput('s2', 'dry_run', true);
 
-    expect($run->status)->toBe(RunStatus::Completed)
-        ->and(SendMessage::$sent)->toBeEmpty()
-        ->and($run->step('s2')->output['dry_run'])->toBeTrue();
+    expect(SendMessage::$sent)->toBeEmpty();
 });
 
 it('keeps runs on the version they started with', function () {
@@ -70,10 +74,10 @@ it('stops and waits at a wait step', function () {
         ->step('s2', 'core.set-variable', ['value' => 'later'])
         ->save();
 
-    $run = Flowkit::start('waits')->refresh();
-
-    expect($run->status)->toBe(RunStatus::Waiting)
-        ->and($run->steps->pluck('step_id')->all())->toBe(['s1']);
+    runFlow('waits')
+        ->assertWaiting()
+        ->assertStepsRan(['s1'])
+        ->assertStepNotReached('s2');
 });
 
 it('fails a step whose settings are invalid', function () {
@@ -81,8 +85,7 @@ it('fails a step whose settings are invalid', function () {
         ->step('s1', 'test.send-message', ['to' => 'someone'])
         ->save();
 
-    $run = Flowkit::start('broken')->refresh();
-
-    expect($run->status)->toBe(RunStatus::Failed)
-        ->and($run->step('s1')->error)->toContain('message');
+    runFlow('broken')
+        ->assertFailed()
+        ->assertStepFailed('s1', 'message');
 });
