@@ -1,0 +1,46 @@
+/*
+ * Flowkit design tokens.
+ *
+ * Customisation level 1: override any of these in your own CSS, e.g.
+ *
+ *   :root { --flowkit-accent: #0f766e; --flowkit-radius: 0.25rem; }
+ *
+ * Components use them through Tailwind arbitrary values such as
+ * bg-[var(--flowkit-surface)], so add the package views to Tailwind's
+ * content sources:
+ *
+ *   @source "../../vendor/act/flowkit/resources/views";
+ */
+
+:root {
+    --flowkit-accent: #4f46e5;
+    --flowkit-accent-contrast: #ffffff;
+    --flowkit-surface: #ffffff;
+    --flowkit-canvas: #f8fafc;
+    --flowkit-border: #e2e8f0;
+    --flowkit-text: #0f172a;
+    --flowkit-muted: #64748b;
+    --flowkit-danger: #dc2626;
+    --flowkit-success: #16a34a;
+    --flowkit-warning: #d97706;
+    --flowkit-radius: 0.75rem;
+    --flowkit-card-width: 22rem;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+        --flowkit-surface: #1e293b;
+        --flowkit-canvas: #0f172a;
+        --flowkit-border: #334155;
+        --flowkit-text: #f1f5f9;
+        --flowkit-muted: #94a3b8;
+    }
+}
+
+.dark {
+    --flowkit-surface: #1e293b;
+    --flowkit-canvas: #0f172a;
+    --flowkit-border: #334155;
+    --flowkit-text: #f1f5f9;
+    --flowkit-muted: #94a3b8;
+}

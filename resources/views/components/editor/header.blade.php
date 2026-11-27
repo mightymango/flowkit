@@ -1,0 +1,13 @@
+@props(['flow'])
+
+<header {{ $attributes->class('flex items-center justify-between gap-4 border-b border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] px-6 py-3') }}>
+    <div class="flex items-center gap-3">
+        <a href="{{ route('flowkit.index') }}" class="text-sm text-[var(--flowkit-muted)] hover:text-[var(--flowkit-text)]">← Flows</a>
+        <h1 class="font-semibold">{{ $flow->name }}</h1>
+        <x-flowkit::status-pill :status="$flow->status" />
+    </div>
+
+    <div class="flex items-center gap-2">
+        {{ $slot }}
+    </div>
+</header>

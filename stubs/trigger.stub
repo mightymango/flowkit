@@ -1,0 +1,25 @@
+<?php
+
+namespace {{ namespace }};
+
+use Act\Flowkit\Bricks\Trigger;
+
+class {{ class }} extends Trigger
+{
+    public static string $key = 'app.{{ key }}';
+
+    public static string $label = '{{ label }}';
+
+    public static string $group = 'App';
+
+    /**
+     * Variables this trigger puts into the context. They drive the
+     * variable chips in the editor.
+     */
+    public function variables(): array
+    {
+        return [
+            // 'employee.name' => 'Employee name',
+        ];
+    }
+}

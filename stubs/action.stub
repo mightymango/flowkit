@@ -1,0 +1,34 @@
+<?php
+
+namespace {{ namespace }};
+
+use Act\Flowkit\Bricks\Action;
+use Act\Flowkit\Engine\Context;
+use Act\Flowkit\Engine\Result;
+use Act\Flowkit\Fields\Text;
+
+class {{ class }} extends Action
+{
+    public static string $key = 'app.{{ key }}';
+
+    public static string $label = '{{ label }}';
+
+    public static string $group = 'App';
+
+    /** Set to false if running this twice would do harm, e.g. send a message. */
+    public static bool $retrySafe = true;
+
+    public function fields(): array
+    {
+        return [
+            Text::make('example')->supportsVariables()->required(),
+        ];
+    }
+
+    public function handle(Context $context, array $settings): Result
+    {
+        //
+
+        return Result::ok([]);
+    }
+}
