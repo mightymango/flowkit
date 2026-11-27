@@ -178,6 +178,25 @@ Core bricks: `core.manual`, `core.model-event`, `core.schedule`, `core.branch`, 
 
 `core.notify` sends an email to a user (a user id from a variable, looked up on `flowkit.notify.user_model` or the auth provider's model) or to an email address. The subject and message take `{{ variables }}`; the message is sent as plain text, never rendered as Blade. A dry run shows what would be sent, and the step's idempotency key stops a retry from sending twice.
 
+### Retries
+
+If an action throws, its step is tried again after a backoff, and each attempt is recorded in `flow_run_steps.attempt`. By default that's 3 attempts in all, waiting 10s, then 60s, then 300s, set in `flowkit.retries`. An action can set its own `public static ?int $tries`.
+
+- **Not retried:** a step whose settings fail validation, or an action that returns `Result::fail()`.
+- **Unsafe actions** (`$retrySafe = false`) get one attempt. The exception is one that sets `public static bool $usesIdempotencyKey = true`, meaning its `handle()` checks `$context->idempotencyKey($stepId)` before doing anything that mustn't happen twice.
+
+Resume a failed run from the step that failed:
+
+```php
+Flowkit::retry($run);
+```
+
+```bash
+php artisan flowkit:retry 42
+```
+
+A resumed run doesn't repeat steps that already completed. It follows the branches it took before and starts the failed step as a new attempt. If that step isn't safe to repeat, the command asks first; skip the question with `--force`.
+
 ## Customisation
 
 | Level | How | Upgrade cost |

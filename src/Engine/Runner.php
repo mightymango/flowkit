@@ -7,6 +7,7 @@ use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Condition;
 use MightyMango\Flowkit\Bricks\Core\Branch;
 use MightyMango\Flowkit\Enums\RunStatus;
+use MightyMango\Flowkit\Jobs\RunFlow;
 use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
 use Illuminate\Support\Facades\Validator;
@@ -16,6 +17,11 @@ use Throwable;
 /**
  * Walks a version's step list against a context, one step at a time,
  * recording every step it takes in flow_run_steps.
+ *
+ * A run can be executed more than once: after an automatic retry, or when
+ * a failed run is retried by hand. Steps that already completed are not
+ * run again; the walk follows their recorded outputs (including which
+ * branch was taken) and picks up at the step that failed, as a new attempt.
  */
 class Runner
 {
@@ -24,6 +30,12 @@ class Runner
      * finish the run as completed. Never stored.
      */
     private const STOPPED = 'stopped';
+
+    /**
+     * Internal signal from a step that threw and can be tried again: stop
+     * walking and queue the run to resume after a backoff. Never stored.
+     */
+    private const RETRY = 'retry';
 
     public function __construct(
         private BrickRegistry $bricks,
@@ -43,29 +55,45 @@ class Runner
             dryRun: $run->dry_run,
         );
 
+        // The latest attempt at each step this run has already taken.
+        $history = $run->steps()->get()->keyBy('step_id')->all();
+
         $run->forceFill(['status' => RunStatus::Running, 'started_at' => $run->started_at ?? now()])->save();
 
-        $outcome = $this->walk($definition->steps, $context, $run);
-        $outcome = $outcome === self::STOPPED ? RunStatus::Completed : $outcome;
+        $retry = null;
+        $outcome = $this->walk($definition->steps, $context, $run, $history, $retry);
+
+        $outcome = match ($outcome) {
+            self::STOPPED => RunStatus::Completed,
+            self::RETRY => RunStatus::Pending,
+            default => $outcome,
+        };
 
         $run->forceFill([
             'status' => $outcome,
             'context' => $context->all(),
-            'finished_at' => $outcome === RunStatus::Waiting ? null : now(),
+            'finished_at' => $outcome->isFinished() ? now() : null,
         ])->save();
+
+        if ($retry !== null) {
+            RunFlow::dispatch($run)->delay(now()->addSeconds($retry));
+        }
 
         return $run;
     }
 
     /**
-     * Run a list of steps in order. Stops early if a step waits or fails, or a standalone condition fails.
+     * Run a list of steps in order. Stops early if a step waits, fails or
+     * will be retried, or a standalone condition fails.
+     *
+     * @param  array<string, FlowRunStep>  $history
      */
-    private function walk(array $steps, Context $context, FlowRun $run): RunStatus|string
+    private function walk(array $steps, Context $context, FlowRun $run, array $history, ?int &$retry): RunStatus|string
     {
         foreach ($steps as $step) {
-            $status = $this->runStep($step, $context, $run);
+            $status = $this->runStep($step, $context, $run, $history, $retry);
 
-            if ($status === self::STOPPED || $status === RunStatus::Waiting || $status === RunStatus::Failed) {
+            if (in_array($status, [self::STOPPED, self::RETRY, RunStatus::Waiting, RunStatus::Failed], true)) {
                 return $status;
             }
         }
@@ -73,15 +101,32 @@ class Runner
         return RunStatus::Completed;
     }
 
-    private function runStep(array $step, Context $context, FlowRun $run): RunStatus|string
+    /**
+     * @param  array<string, FlowRunStep>  $history
+     */
+    private function runStep(array $step, Context $context, FlowRun $run, array $history, ?int &$retry): RunStatus|string
     {
+        $previous = $history[$step['id']] ?? null;
+
+        // Already done on an earlier execution of this run: don't repeat it.
+        // Its output is already in the run's context.
+        if ($previous && in_array($previous->status, [RunStatus::Completed, RunStatus::Skipped], true)) {
+            if (isset($previous->output['branch'])) {
+                return $this->walk($step['branches'][$previous->output['branch']] ?? [], $context, $run, $history, $retry);
+            }
+
+            return ($previous->output['stopped'] ?? false) ? self::STOPPED : $previous->status;
+        }
+
         $started = hrtime(true);
         $record = new FlowRunStep([
             'step_id' => $step['id'],
             'brick' => $step['brick'],
             'status' => RunStatus::Running,
+            'attempt' => ($previous?->attempt ?? 0) + 1,
         ]);
         $record->run()->associate($run);
+        $brick = null;
 
         try {
             $brick = $this->bricks->resolve($step['brick']);
@@ -98,7 +143,7 @@ class Runner
                 $this->finish($record, $started, RunStatus::Completed, ['branch' => $chosen]);
                 $context->recordOutput($step['id'], ['branch' => $chosen]);
 
-                return $this->walk($step['branches'][$chosen] ?? [], $context, $run);
+                return $this->walk($step['branches'][$chosen] ?? [], $context, $run, $history, $retry);
             }
 
             // A condition on its own is a filter: if it fails, the run stops
@@ -128,7 +173,15 @@ class Runner
         } catch (Throwable $e) {
             report($e);
 
-            return $this->finish($record, $started, RunStatus::Failed, error: $e->getMessage());
+            $this->finish($record, $started, RunStatus::Failed, error: $e->getMessage());
+
+            if ($brick instanceof Action && $record->attempt < $brick->tries()) {
+                $retry = $brick->backoff($record->attempt);
+
+                return self::RETRY;
+            }
+
+            return RunStatus::Failed;
         }
     }
 
