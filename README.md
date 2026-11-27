@@ -8,7 +8,7 @@ It has three layers:
 - **A Livewire step-list editor** for staff to build flows.
 - **Anonymous Blade components** under `flowkit::`, which you can restyle with CSS tokens, tweak with attributes, or publish and override, the same way Flux works.
 
-> **Status:** starter scaffold, aimed at phases 1–2 of the plan. See [Roadmap](#roadmap).
+> **Status:** starter scaffold, aimed at phases 1–2 of the plan. See [Roadmap](#roadmap), the full design in [docs/plan.md](docs/plan.md) and the editor mockup in [docs/mockup.html](docs/mockup.html).
 
 ## Install
 
@@ -145,4 +145,4 @@ composer test
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | ⬜ Config hooks only |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, prop docs | 🟡 Publish and tokens; `flowkit:outdated` to do |
 
-Open questions are in the project plan: package name, minimum Livewire version, durable-workflow library, Teams/Graph sign-off, and whether to borrow from AutoBuilder.
+Work is tracked as GitHub issues under four phase milestones. Open questions are in [docs/plan.md](docs/plan.md): package name, minimum Livewire version, durable-workflow library, Teams/Graph sign-off, and whether to borrow from AutoBuilder.
