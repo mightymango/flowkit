@@ -14,7 +14,7 @@ composer test          # Pest, via Orchestra Testbench (sqlite in memory)
 vendor/bin/pest --filter=RunnerTest
 ```
 
-CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.4 against Livewire 3 and 4. Keep it green. If Packagist isn't reachable from your environment, push a branch and read the Actions results instead.
+CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.5 against Laravel 12 and 13 and Livewire 3 and 4 (Laravel 13 needs PHP 8.3+). Keep it green. If Packagist isn't reachable from your environment, push a branch and read the Actions results instead.
 
 ## Architecture
 
@@ -34,7 +34,7 @@ CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.4 against Livewire 3 and 4. 
 - **Validate settings server-side** from the brick's fields, in both the runner and the editor. Never trust the Livewire payload.
 - **Unsafe actions** (`$retrySafe = false`) must use `$context->idempotencyKey($stepId)` and must not run for real in dry-run mode.
 - **Blade components:** take data as props and merge `$attributes` onto the root element. Style with Tailwind classes that reference the `--flowkit-*` tokens in `resources/css/flowkit.css`. Treat a prop change as a breaking change once phase 4 starts.
-- **Laravel 12 only.** Every Laravel 11 release is blocked by Composer's security-advisory policy; don't re-add 11 to the constraints or CI.
+- **Laravel 12 and 13.** Support the current major and the previous one; add Laravel 14 when it's released (it needs PHP 8.4) and drop 12 when its security support ends. Laravel 11 is out: Composer's security-advisory policy blocks every 11.x release.
 - Run data can contain personal data (e.g. employee or customer records). Don't log payloads, and keep retention in mind.
 
 ## Conventions
