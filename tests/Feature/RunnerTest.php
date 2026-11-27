@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use MightyMango\Flowkit\Engine\FlowBuilder;
 use MightyMango\Flowkit\Enums\RunStatus;
 use MightyMango\Flowkit\Facades\Flowkit;
@@ -88,4 +89,39 @@ it('fails a step whose settings are invalid', function () {
     runFlow('broken')
         ->assertFailed()
         ->assertStepFailed('s1', 'message');
+});
+
+it('waits for an open transaction to commit before running', function () {
+    Flowkit::define('after-commit')->trigger('core.manual')
+        ->step('s1', 'core.set-variable', ['value' => 'ran'])
+        ->save();
+
+    $statusInside = null;
+
+    $run = DB::transaction(function () use (&$statusInside) {
+        $run = Flowkit::start('after-commit');
+        $statusInside = $run->refresh()->status;
+
+        return $run;
+    });
+
+    expect($statusInside)->toBe(RunStatus::Pending)
+        ->and($run->refresh()->status)->toBe(RunStatus::Completed);
+});
+
+it('does not run a flow started in a transaction that rolls back', function () {
+    Flowkit::define('rolled-back')->trigger('core.manual')
+        ->step('s1', 'test.send-message', ['to' => 'lead', 'message' => 'Hi'])
+        ->save();
+
+    try {
+        DB::transaction(function () {
+            Flowkit::start('rolled-back');
+
+            throw new RuntimeException('Roll back');
+        });
+    } catch (RuntimeException) {
+    }
+
+    expect(SendMessage::$sent)->toBeEmpty();
 });
