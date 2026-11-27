@@ -20,7 +20,7 @@ function weeklyDigest(array $settings = ['cron' => '0 9 * * 1'], string $key = '
         ->save();
 }
 
-function runsOf(Flow $flow): int
+function scheduledRunsOf(Flow $flow): int
 {
     return FlowRun::whereIn('flow_version_id', $flow->versions()->pluck('id'))->count();
 }
@@ -40,7 +40,7 @@ it('starts a flow whose cron is due', function () {
 
     $run = FlowRun::sole();
 
-    expect(runsOf($flow))->toBe(1)
+    expect(scheduledRunsOf($flow))->toBe(1)
         ->and($run->payload['schedule'])->toBe(['scheduled_at' => '2026-03-02T09:00:00+00:00', 'timezone' => 'UTC'])
         ->and($run->refresh()->step('s1')->output['value'])->toBe('Digest for 2026-03-02T09:00:00+00:00');
 });
@@ -54,7 +54,7 @@ it('does not start a flow whose cron is not due', function () {
     $this->travelTo(Carbon::parse(MONDAY_9AM)->addDay());
     $this->artisan('flowkit:tick')->assertSuccessful();
 
-    expect(runsOf($flow))->toBe(0);
+    expect(scheduledRunsOf($flow))->toBe(0);
 });
 
 it('evaluates the cron in the chosen time zone', function () {
@@ -63,11 +63,11 @@ it('evaluates the cron in the chosen time zone', function () {
 
     $this->travelTo('2026-07-01 09:00:00');
     app(TriggerDispatcher::class)->schedule();
-    expect(runsOf($flow))->toBe(0);
+    expect(scheduledRunsOf($flow))->toBe(0);
 
     $this->travelTo('2026-07-01 08:00:00');
     app(TriggerDispatcher::class)->schedule();
-    expect(runsOf($flow))->toBe(1)
+    expect(scheduledRunsOf($flow))->toBe(1)
         ->and(FlowRun::sole()->payload['schedule'])
         ->toBe(['scheduled_at' => '2026-07-01T09:00:00+01:00', 'timezone' => 'Europe/London']);
 });
@@ -79,7 +79,7 @@ it('ignores paused flows', function () {
 
     $this->artisan('flowkit:tick')->assertSuccessful();
 
-    expect(runsOf($flow))->toBe(0);
+    expect(scheduledRunsOf($flow))->toBe(0);
 });
 
 it('ignores flows that are not live', function () {
@@ -93,7 +93,7 @@ it('ignores flows that are not live', function () {
     $this->artisan('flowkit:tick')->assertSuccessful();
 
     expect($flow->refresh()->status)->toBe(FlowStatus::Draft)
-        ->and(runsOf($flow))->toBe(0);
+        ->and(scheduledRunsOf($flow))->toBe(0);
 });
 
 it('ignores flows with other triggers', function () {
@@ -144,7 +144,7 @@ it('skips a stored flow whose cron is invalid', function () {
 
     $this->artisan('flowkit:tick')->assertSuccessful();
 
-    expect(runsOf($flow))->toBe(0);
+    expect(scheduledRunsOf($flow))->toBe(0);
 });
 
 it('starts only one run when ticked twice in the same minute', function () {
@@ -156,12 +156,12 @@ it('starts only one run when ticked twice in the same minute', function () {
     $this->travelTo(Carbon::parse(MONDAY_9AM)->addSeconds(50));
     $this->artisan('flowkit:tick')->expectsOutputToContain('Started 0 scheduled flows.');
 
-    expect(runsOf($flow))->toBe(1);
+    expect(scheduledRunsOf($flow))->toBe(1);
 
     $this->travelTo(Carbon::parse(MONDAY_9AM)->addMinute());
     $this->artisan('flowkit:tick')->assertSuccessful();
 
-    expect(runsOf($flow))->toBe(2);
+    expect(scheduledRunsOf($flow))->toBe(2);
 });
 
 it('records the claimed minute so a second tick loses the claim', function () {
@@ -173,5 +173,5 @@ it('records the claimed minute so a second tick loses the claim', function () {
     expect($dispatcher->schedule())->toBe(1)
         ->and($dispatcher->schedule(now()))->toBe(0)
         ->and($flow->refresh()->getRawOriginal('last_scheduled_at'))->toBe(MONDAY_9AM)
-        ->and(runsOf($flow))->toBe(1);
+        ->and(scheduledRunsOf($flow))->toBe(1);
 });

@@ -76,9 +76,35 @@ class Employee extends Model
 {
     use HasFlowTriggers;
 
-    protected array $flowTriggers = ['created', 'updated'];
+    protected array $flowTriggers = ['created', 'updated', 'status' => 'changed'];
 }
 ```
+
+Plain entries (`created`, `updated`, `deleted`) fire on those model events. Without `$flowTriggers`, a model fires `created` and `updated`. The model's attributes are in the payload under its snake-cased class name, e.g. `employee.department`; override `toFlowPayload()` to limit what flows see.
+
+An `'attribute' => 'changed'` entry watches that attribute: whenever an update changes it, the model fires a `changed` event with the old and new values under `changes`:
+
+```json
+{
+  "employee": { "id": 7, "name": "Ana", "status": "leaver" },
+  "event": "changed",
+  "changes": { "status": { "from": "active", "to": "leaver" } }
+}
+```
+
+Enum casts are reduced to their value and dates to ISO 8601 strings. To start a flow when an employee becomes a leaver, set the `core.model-event` trigger to:
+
+```php
+->trigger('core.model-event', [
+    'model' => Employee::class,
+    'event' => 'changed',
+    'attribute' => 'status',   // must be watched in $flowTriggers
+    'from' => null,            // optional: only when the old value is this
+    'to' => 'leaver',          // optional: only when the new value is this
+])
+```
+
+An empty `from` or `to` matches any value; values are compared as strings. A trigger whose settings fail validation never matches.
 
 ### Scheduled flows
 
