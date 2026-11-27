@@ -7,6 +7,9 @@ use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Condition;
 use MightyMango\Flowkit\Bricks\Core\Branch;
 use MightyMango\Flowkit\Enums\RunStatus;
+use MightyMango\Flowkit\Events\RunFinished;
+use MightyMango\Flowkit\Events\RunStarted;
+use MightyMango\Flowkit\Events\StepFinished;
 use MightyMango\Flowkit\Jobs\RunFlow;
 use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
@@ -60,6 +63,8 @@ class Runner
 
         $run->forceFill(['status' => RunStatus::Running, 'started_at' => $run->started_at ?? now()])->save();
 
+        RunStarted::dispatch($run->id, $run->flow_version_id, $run->correlation_id, (bool) $run->dry_run, $history !== []);
+
         $retry = null;
         $outcome = $this->walk($definition->steps, $context, $run, $history, $retry);
 
@@ -74,6 +79,10 @@ class Runner
             'context' => $context->all(),
             'finished_at' => $outcome->isFinished() ? now() : null,
         ])->save();
+
+        if ($outcome->isFinished()) {
+            RunFinished::dispatch($run->id, $run->flow_version_id, $run->correlation_id, $outcome, (bool) $run->dry_run);
+        }
 
         if ($retry !== null) {
             RunFlow::dispatch($run)->delay(now()->addSeconds($retry));
@@ -127,6 +136,7 @@ class Runner
         ]);
         $record->run()->associate($run);
         $brick = null;
+        $handled = false;
 
         try {
             $brick = $this->bricks->resolve($step['brick']);
@@ -139,8 +149,9 @@ class Runner
             }
 
             if ($brick instanceof Branch) {
+                $handled = true;
                 $chosen = $brick->decide($context, $settings);
-                $this->finish($record, $started, RunStatus::Completed, ['branch' => $chosen]);
+                $this->finish($record, $started, RunStatus::Completed, ['branch' => $chosen], handled: true);
                 $context->recordOutput($step['id'], ['branch' => $chosen]);
 
                 return $this->walk($step['branches'][$chosen] ?? [], $context, $run, $history, $retry);
@@ -149,10 +160,11 @@ class Runner
             // A condition on its own is a filter: if it fails, the run stops
             // here and completes without running the steps after it.
             if ($brick instanceof Condition) {
+                $handled = true;
                 $passed = $brick->check($context, $settings);
                 $output = $passed ? ['passed' => true] : ['passed' => false, 'stopped' => true];
                 $context->recordOutput($step['id'], $output);
-                $this->finish($record, $started, RunStatus::Completed, $output);
+                $this->finish($record, $started, RunStatus::Completed, $output, handled: true);
 
                 return $passed ? RunStatus::Completed : self::STOPPED;
             }
@@ -163,17 +175,19 @@ class Runner
 
             $context->forStep($step['id']);
 
-            $result = $context->dryRun && ! $brick::$retrySafe
-                ? $brick->dryRun($context, $settings)
-                : $brick->handle($context, $settings);
+            $handled = ! ($context->dryRun && ! $brick::$retrySafe);
+
+            $result = $handled
+                ? $brick->handle($context, $settings)
+                : $brick->dryRun($context, $settings);
 
             $context->recordOutput($step['id'], $result->output);
 
-            return $this->finish($record, $started, $result->status, $result->output, $result->error);
+            return $this->finish($record, $started, $result->status, $result->output, $result->error, $handled);
         } catch (Throwable $e) {
             report($e);
 
-            $this->finish($record, $started, RunStatus::Failed, error: $e->getMessage());
+            $this->finish($record, $started, RunStatus::Failed, error: $e->getMessage(), handled: $handled);
 
             if ($brick instanceof Action && $record->attempt < $brick->tries()) {
                 $retry = $brick->backoff($record->attempt);
@@ -185,7 +199,7 @@ class Runner
         }
     }
 
-    private function finish(FlowRunStep $record, int $started, RunStatus $status, array $output = [], ?string $error = null): RunStatus
+    private function finish(FlowRunStep $record, int $started, RunStatus $status, array $output = [], ?string $error = null, bool $handled = false): RunStatus
     {
         $record->fill([
             'status' => $status,
@@ -193,6 +207,8 @@ class Runner
             'error' => $error,
             'duration_ms' => (int) ((hrtime(true) - $started) / 1_000_000),
         ])->save();
+
+        StepFinished::dispatch($record->flow_run_id, $record->id, $record->step_id, $record->brick, $status, $record->attempt, $handled);
 
         return $status;
     }

@@ -198,6 +198,20 @@ php artisan flowkit:retry 42
 
 A resumed run doesn't repeat steps that already completed. It follows the branches it took before and starts the failed step as a new attempt. If that step isn't safe to repeat, the command asks first; skip the question with `--force`.
 
+### Events
+
+The runner fires Laravel events you can listen for, e.g. for metrics or alerts:
+
+| Event | When | Properties |
+| --- | --- | --- |
+| `MightyMango\Flowkit\Events\RunStarted` | A run starts executing, and again each time it resumes | `runId`, `flowVersionId`, `correlationId`, `dryRun`, `resumed` |
+| `MightyMango\Flowkit\Events\StepFinished` | Each attempt at a step is recorded | `runId`, `stepRecordId`, `stepId`, `brick`, `status`, `attempt`, `handled` |
+| `MightyMango\Flowkit\Events\RunFinished` | A run completes or fails (not when it waits or is queued for a retry) | `runId`, `flowVersionId`, `correlationId`, `status`, `dryRun` |
+
+`handled` is true when the brick's own logic really ran: an action's `handle()`, a condition's check or a branch's decision. It's false when the settings failed validation, or when an unsafe action was replaced by its dry run.
+
+The events carry IDs and status only, never the payload, input or output, because run data can contain personal data. If a listener loads the run or step record for more, take the same care with it.
+
 ## Customisation
 
 | Level | How | Upgrade cost |
@@ -242,7 +256,7 @@ runFlow('new-starter', ['employee' => ['name' => 'Ana', 'department' => 'Deliver
 runFlow('new-starter', $payload, dryRun: true); // unsafe actions run in dry-run mode
 ```
 
-Runs started with `runFlow()` or `Flowkit::run()` still execute under the fake, and the fake records every action they reach:
+Runs started with `runFlow()` or `Flowkit::run()` still execute under the fake, and the fake records every action whose `handle()` runs, one entry per attempt:
 
 ```php
 Flowkit::fake();
@@ -255,7 +269,7 @@ Flowkit::assertActionRanTimes('teams.message', 1);
 Flowkit::assertActionNotRan('hr.update-record');
 ```
 
-The callback gets the step's resolved settings, its output and the `FlowRunStep`. Unsafe actions in a dry run don't count as having run. The helpers use plain PHPUnit assertions, so they work with Pest or PHPUnit; `runFlow()` is autoloaded with the package and is skipped if your app already defines a function of that name (use `new MightyMango\Flowkit\Testing\TestRun(Flowkit::run(...))` instead).
+The callback gets the step's resolved settings, its output and the `FlowRunStep`. An action whose settings failed validation, or an unsafe action replaced by its dry run, doesn't count as having run. The fake listens for the runner's `StepFinished` event, so don't use `Event::fake()` for that event in the same test. The helpers use plain PHPUnit assertions, so they work with Pest or PHPUnit; `runFlow()` is autoloaded with the package and is skipped if your app already defines a function of that name (use `new MightyMango\Flowkit\Testing\TestRun(Flowkit::run(...))` instead).
 
 ### Testing the package
 

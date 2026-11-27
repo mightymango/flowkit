@@ -3,11 +3,13 @@
 namespace MightyMango\Flowkit\Testing;
 
 use MightyMango\Flowkit\Bricks\Action;
+use MightyMango\Flowkit\Events\StepFinished;
 use MightyMango\Flowkit\Flowkit;
 use MightyMango\Flowkit\Models\Flow;
 use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Testing\Fakes\Fake;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -15,21 +17,25 @@ use PHPUnit\Framework\Assert as PHPUnit;
  * Swapped in by Flowkit::fake(). Like Queue::fake(), runs started with
  * start() or test() are recorded as pending and never executed. Runs started
  * with run() (and so runFlow()) still execute in this process, and every
- * action they reach is recorded for assertActionRan().
+ * action whose handle() runs is recorded for assertActionRan(), from the
+ * runner's StepFinished events. (Event::fake() stops those events, so don't
+ * combine the two if you assert on actions.)
  */
 class FlowkitFake extends Flowkit implements Fake
 {
     /** @var list<array{flow: string, payload: array, run: FlowRun}> */
     protected array $started = [];
 
-    /** Step records at or below this id belong to runs from before the fake. */
-    protected int $stepBaseline;
+    /** @var list<StepFinished> */
+    protected array $steps = [];
 
     public function __construct(protected Flowkit $real)
     {
         parent::__construct($real->bricks());
 
-        $this->stepBaseline = (int) FlowRunStep::max('id');
+        Event::listen(StepFinished::class, function (StepFinished $event) {
+            $this->steps[] = $event;
+        });
     }
 
     public function real(): Flowkit
@@ -134,9 +140,9 @@ class FlowkitFake extends Flowkit implements Fake
     }
 
     /**
-     * Action steps the runner has reached since the fake was swapped in,
-     * from the steps it records in flow_run_steps. Unsafe actions in a dry
-     * run don't count: they never ran for real.
+     * Attempts at action steps whose handle() really ran since the fake was
+     * swapped in, from the runner's StepFinished events. A step that failed
+     * validation, or an unsafe action replaced by its dry run, doesn't count.
      *
      * @param  callable(array $input, array $output, FlowRunStep $step): bool|null  $callback
      * @return Collection<int, FlowRunStep>
@@ -145,14 +151,16 @@ class FlowkitFake extends Flowkit implements Fake
     {
         $actions = $this->bricks->all(Action::type());
 
+        $ids = collect($this->steps)
+            ->filter(fn (StepFinished $event) => $event->handled && isset($actions[$event->brick]))
+            ->when($brick !== null, fn (Collection $c) => $c->where('brick', $brick))
+            ->map(fn (StepFinished $event) => $event->stepRecordId)
+            ->all();
+
         return FlowRunStep::query()
-            ->with('run')
-            ->where('id', '>', $this->stepBaseline)
-            ->whereIn('brick', $brick === null ? array_keys($actions) : [$brick])
+            ->whereKey($ids)
             ->orderBy('id')
             ->get()
-            ->filter(fn (FlowRunStep $step) => isset($actions[$step->brick]))
-            ->reject(fn (FlowRunStep $step) => $step->run->dry_run && ! $actions[$step->brick]::$retrySafe)
             ->filter(fn (FlowRunStep $step) => ! $callback || $callback($step->input ?? [], $step->output ?? [], $step))
             ->values();
     }

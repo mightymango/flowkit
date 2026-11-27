@@ -6,6 +6,7 @@ use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
 use MightyMango\Flowkit\Testing\FlowkitFake;
 use MightyMango\Flowkit\TriggerDispatcher;
+use MightyMango\Flowkit\Tests\Fixtures\Bricks\Flaky;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\SendMessage;
 use PHPUnit\Framework\AssertionFailedError;
 
@@ -93,6 +94,27 @@ it('does not count unsafe actions in a dry run', function () {
 
     Flowkit::assertActionNotRan('test.send-message');
     Flowkit::assertActionRan('core.set-variable');
+});
+
+it('does not count an action whose settings failed validation', function () {
+    Flowkit::define('invalid')->trigger('core.manual')
+        ->step('s1', 'test.send-message', ['to' => 'lead'])
+        ->save();
+    Flowkit::fake();
+
+    runFlow('invalid')->assertFailed()->assertStepFailed('s1');
+
+    Flowkit::assertActionNotRan('test.send-message');
+});
+
+it('counts each attempt at an action that is retried', function () {
+    Flaky::$failures = 1;
+    Flowkit::define('flaky')->trigger('core.manual')->step('s1', 'test.flaky', [])->save();
+    Flowkit::fake();
+
+    runFlow('flaky')->assertCompleted();
+
+    Flowkit::assertActionRanTimes('test.flaky', 2);
 });
 
 it('ignores actions that ran before the fake', function () {
