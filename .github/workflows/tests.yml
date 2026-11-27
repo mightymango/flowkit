@@ -13,12 +13,11 @@ jobs:
       matrix:
         php: ['8.2', '8.3', '8.4', '8.5']
         laravel: ['12.*', '13.*']
-        livewire: ['3.*', '4.*']
         exclude:
           - php: '8.2'
             laravel: '13.*'
 
-    name: PHP ${{ matrix.php }} · Laravel ${{ matrix.laravel }} · Livewire ${{ matrix.livewire }}
+    name: PHP ${{ matrix.php }} · Laravel ${{ matrix.laravel }}
 
     steps:
       - uses: actions/checkout@v4
@@ -31,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "illuminate/support:${{ matrix.laravel }}" "livewire/livewire:${{ matrix.livewire }}" --no-interaction --no-update
+          composer require "illuminate/support:${{ matrix.laravel }}" --no-interaction --no-update
           composer update --prefer-dist --no-interaction --no-progress --with-all-dependencies
 
       - name: Run tests

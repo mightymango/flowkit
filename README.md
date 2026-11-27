@@ -12,6 +12,8 @@ It has three layers:
 
 ## Install
 
+Requires PHP 8.2+, Laravel 12 or 13, and Livewire 4.
+
 ```bash
 composer require mightymango/flowkit
 php artisan migrate
@@ -145,4 +147,4 @@ composer test
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | ⬜ Config hooks only |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, prop docs | 🟡 Publish and tokens; `flowkit:outdated` to do |
 
-Work is tracked as GitHub issues under four phase milestones. Open questions are in [docs/plan.md](docs/plan.md): package name, minimum Livewire version, durable-workflow library, Teams/Graph sign-off, and whether to borrow from AutoBuilder.
+Work is tracked as GitHub issues under four phase milestones. Open questions are in [docs/plan.md](docs/plan.md): package name, durable-workflow library, Teams/Graph sign-off, and whether to borrow from AutoBuilder.

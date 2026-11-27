@@ -112,7 +112,7 @@ The editor is a few Livewire components that compose anonymous Blade components.
 - `flowkit::field.text`, `flowkit::field.select`, `flowkit::field.model-picker`, `flowkit::field.duration`, `flowkit::field.variable-chips`
 - `flowkit::run.timeline`, `flowkit::run.step-row`, `flowkit::status-pill`, `flowkit::empty-state`
 
-The step tree renders recursively: `step.card` for normal steps, `branch.group` for branches, which in turn render child step lists. Reordering uses Livewire's `wire:sort` (or SortableJS on older versions) and updates the tree by step ID.
+The step tree renders recursively: `step.card` for normal steps, `branch.group` for branches, which in turn render child step lists. Reordering uses Livewire 4's `wire:sort` and updates the tree by step ID.
 
 Each Blade component should take props for its data and merge `$attributes` onto its root element. That way a host app can tweak a component in place, e.g. `<x-flowkit::step.card class="shadow-none" />`, without publishing it.
 
@@ -222,7 +222,10 @@ Phases 1 and 2 deliver something usable inside a host app on their own. Phases 3
 **Open questions**
 
 - Whether the package stays internal or is open-sourced. (The name is settled: `mightymango/flowkit`.)
-- Minimum Livewire version: supporting only v4 means you can use `wire:sort` and avoid SortableJS.
 - Which durable-workflow library to use, and whether it fits your current queue driver.
 - Teams messaging through Microsoft Graph needs an Entra app registration and data-protection sign-off before phase 1's notification brick.
 - Whether to fork AutoBuilder's engine (MIT) as a starting point, or start fresh and use it only as a reference.
+
+## Decisions
+
+**Minimum Livewire version: 4** (#1, 27 Nov 2026). Flowkit requires `livewire/livewire ^4.0`. The editor reorders steps with `wire:sort`, so there's no SortableJS. CI tests Livewire 4 only. At the time, the one host app checked (mangofolio) was already on Livewire 4.2, and Livewire 4.0 had been out since January 2026.
