@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 use LogicException;
 use MightyMango\Flowkit\Engine\Definition;
 
@@ -16,7 +17,7 @@ use MightyMango\Flowkit\Engine\Definition;
  * @property int $flow_id
  * @property int $version
  * @property array<string, mixed>|null $definition
- * @property \Illuminate\Support\Carbon|null $published_at
+ * @property Carbon|null $published_at
  * @property-read Flow $flow
  */
 class FlowVersion extends Model

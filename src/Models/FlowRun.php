@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use MightyMango\Flowkit\Enums\RunStatus;
 
 /**
@@ -20,8 +21,8 @@ use MightyMango\Flowkit\Enums\RunStatus;
  * @property array<string, mixed>|null $context
  * @property RunStatus $status
  * @property bool $dry_run
- * @property \Illuminate\Support\Carbon|null $started_at
- * @property \Illuminate\Support\Carbon|null $finished_at
+ * @property Carbon|null $started_at
+ * @property Carbon|null $finished_at
  * @property-read FlowVersion $version
  */
 class FlowRun extends Model
@@ -64,7 +65,7 @@ class FlowRun extends Model
      * configured retention period by `php artisan model:prune`.
      */
     /**
-     * @return Builder<static>
+     * @return Builder<FlowRun>
      */
     public function prunable(): Builder
     {
