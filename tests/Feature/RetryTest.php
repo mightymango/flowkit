@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Queue;
 use MightyMango\Flowkit\Engine\FlowBuilder;
 use MightyMango\Flowkit\Engine\Runner;
 use MightyMango\Flowkit\Enums\RunStatus;
@@ -8,7 +9,6 @@ use MightyMango\Flowkit\Jobs\RunFlow;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\Flaky;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\FlakySend;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\SendMessage;
-use Illuminate\Support\Facades\Queue;
 
 function flakyFlow(string $brick = 'test.flaky')
 {

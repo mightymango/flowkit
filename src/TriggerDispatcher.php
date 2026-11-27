@@ -3,15 +3,16 @@
 namespace MightyMango\Flowkit;
 
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+use LogicException;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\ModelEvent;
 use MightyMango\Flowkit\Bricks\Core\Schedule;
 use MightyMango\Flowkit\Enums\FlowStatus;
 use MightyMango\Flowkit\Models\Flow;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 /**
  * Finds live flows whose trigger matches an event and starts a run of each.
@@ -73,6 +74,10 @@ class TriggerDispatcher
     {
         $minute = Carbon::instance($now ?? now())->utc()->startOfMinute();
         $brick = $this->bricks->resolve(Schedule::$key);
+
+        if (! $brick instanceof Schedule) {
+            throw new LogicException('The core.schedule brick has been replaced by one that is not a Schedule trigger.');
+        }
 
         return $this->fire(Schedule::$key, [], function (array $settings, Flow $flow) use ($brick, $minute) {
             // Never trust stored settings: an invalid cron is skipped, not run.

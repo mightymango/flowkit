@@ -2,14 +2,26 @@
 
 namespace MightyMango\Flowkit\Models;
 
-use MightyMango\Flowkit\Engine\Definition;
-use MightyMango\Flowkit\Enums\FlowStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use MightyMango\Flowkit\Engine\Definition;
+use MightyMango\Flowkit\Enums\FlowStatus;
 
+/**
+ * @property int $id
+ * @property string $key
+ * @property string $name
+ * @property string|null $description
+ * @property FlowStatus|null $status
+ * @property int|null $live_version_id
+ * @property bool $paused
+ * @property string|null $last_scheduled_at
+ * @property-read FlowVersion|null $liveVersion
+ * @property-read FlowVersion|null $latestVersion
+ */
 class Flow extends Model
 {
     protected $guarded = [];
@@ -19,21 +31,25 @@ class Flow extends Model
         'paused' => 'boolean',
     ];
 
+    /** @return MorphTo<Model, $this> */
     public function owner(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /** @return HasMany<FlowVersion, $this> */
     public function versions(): HasMany
     {
         return $this->hasMany(FlowVersion::class)->orderBy('version');
     }
 
+    /** @return BelongsTo<FlowVersion, $this> */
     public function liveVersion(): BelongsTo
     {
         return $this->belongsTo(FlowVersion::class, 'live_version_id');
     }
 
+    /** @return HasOne<FlowVersion, $this> */
     public function latestVersion(): HasOne
     {
         return $this->hasOne(FlowVersion::class)->latestOfMany('version');
@@ -53,15 +69,15 @@ class Flow extends Model
         }
 
         return $this->versions()->create([
-            'version' => ($latest?->version ?? 0) + 1,
-            'definition' => $latest?->definition ?? Definition::empty()->toArray(),
+            'version' => $latest ? $latest->version + 1 : 1,
+            'definition' => $latest ? $latest->definition : Definition::empty()->toArray(),
         ]);
     }
 
     /**
      * Publish a version and make it the one new runs use.
      */
-    public function publish(FlowVersion $version, $approver = null): FlowVersion
+    public function publish(FlowVersion $version, ?Model $approver = null): FlowVersion
     {
         Definition::fromArray($version->definition)->validate();
 

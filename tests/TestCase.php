@@ -2,13 +2,13 @@
 
 namespace MightyMango\Flowkit\Tests;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\LivewireServiceProvider;
 use MightyMango\Flowkit\FlowkitServiceProvider;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\Flaky;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\FlakySend;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\HasRole;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\SendMessage;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra

@@ -3,8 +3,8 @@
 namespace MightyMango\Flowkit\Concerns;
 
 use BackedEnum;
-use MightyMango\Flowkit\TriggerDispatcher;
 use Illuminate\Database\Eloquent\Model;
+use MightyMango\Flowkit\TriggerDispatcher;
 use ReflectionClass;
 use UnitEnum;
 

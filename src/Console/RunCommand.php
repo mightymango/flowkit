@@ -2,8 +2,8 @@
 
 namespace MightyMango\Flowkit\Console;
 
-use MightyMango\Flowkit\Flowkit;
 use Illuminate\Console\Command;
+use MightyMango\Flowkit\Flowkit;
 
 class RunCommand extends Command
 {

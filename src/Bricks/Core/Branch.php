@@ -2,6 +2,7 @@
 
 namespace MightyMango\Flowkit\Bricks\Core;
 
+use LogicException;
 use MightyMango\Flowkit\Bricks\Brick;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Condition;
@@ -10,7 +11,6 @@ use MightyMango\Flowkit\Engine\Expression;
 use MightyMango\Flowkit\Fields\Field;
 use MightyMango\Flowkit\Fields\Select;
 use MightyMango\Flowkit\Fields\Text;
-use LogicException;
 
 /**
  * If/otherwise. Tests either an expression (`when`) or a Condition brick

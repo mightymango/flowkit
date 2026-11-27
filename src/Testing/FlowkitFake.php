@@ -2,15 +2,15 @@
 
 namespace MightyMango\Flowkit\Testing;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Testing\Fakes\Fake;
 use MightyMango\Flowkit\Bricks\Action;
 use MightyMango\Flowkit\Events\StepFinished;
 use MightyMango\Flowkit\Flowkit;
 use MightyMango\Flowkit\Models\Flow;
 use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Testing\Fakes\Fake;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**

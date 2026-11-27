@@ -2,10 +2,10 @@
 
 namespace MightyMango\Flowkit\Engine;
 
-use MightyMango\Flowkit\Bricks\BrickRegistry;
-use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
+use MightyMango\Flowkit\Bricks\BrickRegistry;
+use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 
 /**
  * A flow definition: a trigger plus an ordered list of steps. A branch step

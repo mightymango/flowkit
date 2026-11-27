@@ -2,6 +2,11 @@
 
 namespace MightyMango\Flowkit;
 
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core;
 use MightyMango\Flowkit\Console\MakeBrickCommand;
@@ -13,11 +18,6 @@ use MightyMango\Flowkit\Engine\Expression;
 use MightyMango\Flowkit\Engine\Runner;
 use MightyMango\Flowkit\Livewire\FlowEditor;
 use MightyMango\Flowkit\Livewire\FlowList;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
 
 class FlowkitServiceProvider extends ServiceProvider
 {

@@ -2,15 +2,22 @@
 
 namespace MightyMango\Flowkit\Models;
 
-use MightyMango\Flowkit\Engine\Definition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use LogicException;
+use MightyMango\Flowkit\Engine\Definition;
 
 /**
  * An immutable snapshot of a flow definition once published.
+ *
+ * @property int $id
+ * @property int $flow_id
+ * @property int $version
+ * @property array<string, mixed>|null $definition
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property-read Flow $flow
  */
 class FlowVersion extends Model
 {
@@ -30,21 +37,25 @@ class FlowVersion extends Model
         });
     }
 
+    /** @return BelongsTo<Flow, $this> */
     public function flow(): BelongsTo
     {
         return $this->belongsTo(Flow::class);
     }
 
+    /** @return HasMany<FlowRun, $this> */
     public function runs(): HasMany
     {
         return $this->hasMany(FlowRun::class);
     }
 
+    /** @return MorphTo<Model, $this> */
     public function author(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /** @return MorphTo<Model, $this> */
     public function approver(): MorphTo
     {
         return $this->morphTo();
