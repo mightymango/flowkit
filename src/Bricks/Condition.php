@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Bricks;
+namespace MightyMango\Flowkit\Bricks;
 
-use Act\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Engine\Context;
 
 /**
  * Returns true or false. Used by branch steps.

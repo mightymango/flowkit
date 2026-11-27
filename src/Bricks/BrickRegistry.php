@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Bricks;
+namespace MightyMango\Flowkit\Bricks;
 
-use Act\Flowkit\Exceptions\UnknownBrick;
+use MightyMango\Flowkit\Exceptions\UnknownBrick;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Str;
 use InvalidArgumentException;

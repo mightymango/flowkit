@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Fields;
+namespace MightyMango\Flowkit\Fields;
 
 /**
  * An ISO 8601 duration such as P7D or PT2H.

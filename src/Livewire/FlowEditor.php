@@ -1,12 +1,12 @@
 <?php
 
-namespace Act\Flowkit\Livewire;
+namespace MightyMango\Flowkit\Livewire;
 
-use Act\Flowkit\Bricks\BrickRegistry;
-use Act\Flowkit\Bricks\Core\Branch;
-use Act\Flowkit\Engine\Definition;
-use Act\Flowkit\Exceptions\InvalidDefinition;
-use Act\Flowkit\Models\Flow;
+use MightyMango\Flowkit\Bricks\BrickRegistry;
+use MightyMango\Flowkit\Bricks\Core\Branch;
+use MightyMango\Flowkit\Engine\Definition;
+use MightyMango\Flowkit\Exceptions\InvalidDefinition;
+use MightyMango\Flowkit\Models\Flow;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Component;

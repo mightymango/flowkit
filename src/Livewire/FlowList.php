@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Livewire;
+namespace MightyMango\Flowkit\Livewire;
 
-use Act\Flowkit\Models\Flow;
+use MightyMango\Flowkit\Models\Flow;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Component;

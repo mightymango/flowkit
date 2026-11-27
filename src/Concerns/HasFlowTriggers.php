@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Concerns;
+namespace MightyMango\Flowkit\Concerns;
 
-use Act\Flowkit\TriggerDispatcher;
+use MightyMango\Flowkit\TriggerDispatcher;
 use Illuminate\Database\Eloquent\Model;
 use ReflectionClass;
 

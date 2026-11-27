@@ -1,11 +1,11 @@
 <?php
 
-namespace Act\Flowkit\Bricks\Core;
+namespace MightyMango\Flowkit\Bricks\Core;
 
-use Act\Flowkit\Bricks\Action;
-use Act\Flowkit\Engine\Context;
-use Act\Flowkit\Engine\Result;
-use Act\Flowkit\Fields\Duration;
+use MightyMango\Flowkit\Bricks\Action;
+use MightyMango\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Engine\Result;
+use MightyMango\Flowkit\Fields\Duration;
 
 /**
  * Pause the run. The runner marks the run as waiting; resuming it is the job

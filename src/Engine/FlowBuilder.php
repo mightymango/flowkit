@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Engine;
+namespace MightyMango\Flowkit\Engine;
 
-use Act\Flowkit\Models\Flow;
+use MightyMango\Flowkit\Models\Flow;
 use Closure;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Bricks;
+namespace MightyMango\Flowkit\Bricks;
 
 /**
  * Starts a run. Declares the variables it puts into the context; that list

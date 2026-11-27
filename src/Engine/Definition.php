@@ -1,9 +1,9 @@
 <?php
 
-namespace Act\Flowkit\Engine;
+namespace MightyMango\Flowkit\Engine;
 
-use Act\Flowkit\Bricks\BrickRegistry;
-use Act\Flowkit\Exceptions\InvalidDefinition;
+use MightyMango\Flowkit\Bricks\BrickRegistry;
+use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 

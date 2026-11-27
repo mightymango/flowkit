@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Bricks;
+namespace MightyMango\Flowkit\Bricks;
 
-use Act\Flowkit\Fields\Field;
+use MightyMango\Flowkit\Fields\Field;
 
 /**
  * The base of every trigger, condition and action. A brick declares its own

@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Engine;
+namespace MightyMango\Flowkit\Engine;
 
-use Act\Flowkit\Enums\RunStatus;
+use MightyMango\Flowkit\Enums\RunStatus;
 
 /**
  * What a brick hands back to the runner.

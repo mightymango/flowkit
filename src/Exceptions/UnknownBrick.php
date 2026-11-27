@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Exceptions;
+namespace MightyMango\Flowkit\Exceptions;
 
 use InvalidArgumentException;
 

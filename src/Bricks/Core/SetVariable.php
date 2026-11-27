@@ -1,11 +1,11 @@
 <?php
 
-namespace Act\Flowkit\Bricks\Core;
+namespace MightyMango\Flowkit\Bricks\Core;
 
-use Act\Flowkit\Bricks\Action;
-use Act\Flowkit\Engine\Context;
-use Act\Flowkit\Engine\Result;
-use Act\Flowkit\Fields\Text;
+use MightyMango\Flowkit\Bricks\Action;
+use MightyMango\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Engine\Result;
+use MightyMango\Flowkit\Fields\Text;
 
 /**
  * Store a value for later steps, available as `steps.<id>.value`.

@@ -1,9 +1,9 @@
 <?php
 
-namespace Act\Flowkit\Jobs;
+namespace MightyMango\Flowkit\Jobs;
 
-use Act\Flowkit\Engine\Runner;
-use Act\Flowkit\Models\FlowRun;
+use MightyMango\Flowkit\Engine\Runner;
+use MightyMango\Flowkit\Models\FlowRun;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

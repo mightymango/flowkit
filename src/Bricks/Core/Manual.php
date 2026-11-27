@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Bricks\Core;
+namespace MightyMango\Flowkit\Bricks\Core;
 
-use Act\Flowkit\Bricks\Trigger;
+use MightyMango\Flowkit\Bricks\Trigger;
 
 /**
  * Started from code or `php artisan flowkit:run`, with whatever payload is

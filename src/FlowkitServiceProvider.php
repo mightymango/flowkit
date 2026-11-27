@@ -1,16 +1,16 @@
 <?php
 
-namespace Act\Flowkit;
+namespace MightyMango\Flowkit;
 
-use Act\Flowkit\Bricks\BrickRegistry;
-use Act\Flowkit\Bricks\Core;
-use Act\Flowkit\Console\MakeBrickCommand;
-use Act\Flowkit\Console\PublishCommand;
-use Act\Flowkit\Console\RunCommand;
-use Act\Flowkit\Engine\Expression;
-use Act\Flowkit\Engine\Runner;
-use Act\Flowkit\Livewire\FlowEditor;
-use Act\Flowkit\Livewire\FlowList;
+use MightyMango\Flowkit\Bricks\BrickRegistry;
+use MightyMango\Flowkit\Bricks\Core;
+use MightyMango\Flowkit\Console\MakeBrickCommand;
+use MightyMango\Flowkit\Console\PublishCommand;
+use MightyMango\Flowkit\Console\RunCommand;
+use MightyMango\Flowkit\Engine\Expression;
+use MightyMango\Flowkit\Engine\Runner;
+use MightyMango\Flowkit\Livewire\FlowEditor;
+use MightyMango\Flowkit\Livewire\FlowList;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;

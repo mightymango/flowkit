@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Console;
+namespace MightyMango\Flowkit\Console;
 
-use Act\Flowkit\Flowkit;
+use MightyMango\Flowkit\Flowkit;
 use Illuminate\Console\Command;
 
 class RunCommand extends Command

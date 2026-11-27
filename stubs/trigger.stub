@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use Act\Flowkit\Bricks\Trigger;
+use MightyMango\Flowkit\Bricks\Trigger;
 
 class {{ class }} extends Trigger
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Fields;
+namespace MightyMango\Flowkit\Fields;
 
 use Closure;
 use Illuminate\Validation\Rule;

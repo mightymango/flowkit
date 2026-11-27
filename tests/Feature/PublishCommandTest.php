@@ -11,7 +11,7 @@ it('publishes a component with a version header', function () {
     $path = resource_path('views/flowkit/step/card.blade.php');
 
     expect(File::exists($path))->toBeTrue()
-        ->and(File::get($path))->toStartWith('{{-- Published from act/flowkit');
+        ->and(File::get($path))->toStartWith('{{-- Published from mightymango/flowkit');
 });
 
 it('refuses to overwrite without --force', function () {

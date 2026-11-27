@@ -1,9 +1,9 @@
 <?php
 
-namespace Act\Flowkit\Tests;
+namespace MightyMango\Flowkit\Tests;
 
-use Act\Flowkit\FlowkitServiceProvider;
-use Act\Flowkit\Tests\Fixtures\Bricks\SendMessage;
+use MightyMango\Flowkit\FlowkitServiceProvider;
+use MightyMango\Flowkit\Tests\Fixtures\Bricks\SendMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\LivewireServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;

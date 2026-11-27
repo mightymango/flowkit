@@ -2,8 +2,8 @@
 
 namespace {{ namespace }};
 
-use Act\Flowkit\Bricks\Condition;
-use Act\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Bricks\Condition;
+use MightyMango\Flowkit\Engine\Context;
 
 class {{ class }} extends Condition
 {

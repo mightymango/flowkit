@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Console;
+namespace MightyMango\Flowkit\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;

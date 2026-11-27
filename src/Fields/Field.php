@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Fields;
+namespace MightyMango\Flowkit\Fields;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;

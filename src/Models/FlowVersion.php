@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Models;
+namespace MightyMango\Flowkit\Models;
 
-use Act\Flowkit\Engine\Definition;
+use MightyMango\Flowkit\Engine\Definition;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

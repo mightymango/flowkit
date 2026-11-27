@@ -1,8 +1,8 @@
 <?php
 
-namespace Act\Flowkit\Models;
+namespace MightyMango\Flowkit\Models;
 
-use Act\Flowkit\Enums\RunStatus;
+use MightyMango\Flowkit\Enums\RunStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 

@@ -1,7 +1,7 @@
 <?php
 
-use Act\Flowkit\Engine\Definition;
-use Act\Flowkit\Exceptions\InvalidDefinition;
+use MightyMango\Flowkit\Engine\Definition;
+use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 
 it('flattens the step tree', function () {
     $definition = Definition::fromArray([

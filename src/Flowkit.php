@@ -1,13 +1,13 @@
 <?php
 
-namespace Act\Flowkit;
+namespace MightyMango\Flowkit;
 
-use Act\Flowkit\Bricks\BrickRegistry;
-use Act\Flowkit\Engine\FlowBuilder;
-use Act\Flowkit\Enums\RunStatus;
-use Act\Flowkit\Jobs\RunFlow;
-use Act\Flowkit\Models\Flow;
-use Act\Flowkit\Models\FlowRun;
+use MightyMango\Flowkit\Bricks\BrickRegistry;
+use MightyMango\Flowkit\Engine\FlowBuilder;
+use MightyMango\Flowkit\Enums\RunStatus;
+use MightyMango\Flowkit\Jobs\RunFlow;
+use MightyMango\Flowkit\Models\Flow;
+use MightyMango\Flowkit\Models\FlowRun;
 use Illuminate\Support\Str;
 use RuntimeException;
 

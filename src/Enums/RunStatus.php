@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Enums;
+namespace MightyMango\Flowkit\Enums;
 
 enum RunStatus: string
 {

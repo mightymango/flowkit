@@ -1,12 +1,12 @@
 <?php
 
-namespace Act\Flowkit\Tests\Fixtures\Bricks;
+namespace MightyMango\Flowkit\Tests\Fixtures\Bricks;
 
-use Act\Flowkit\Bricks\Action;
-use Act\Flowkit\Engine\Context;
-use Act\Flowkit\Engine\Result;
-use Act\Flowkit\Fields\Text;
-use Act\Flowkit\Fields\Textarea;
+use MightyMango\Flowkit\Bricks\Action;
+use MightyMango\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Engine\Result;
+use MightyMango\Flowkit\Fields\Text;
+use MightyMango\Flowkit\Fields\Textarea;
 
 class SendMessage extends Action
 {

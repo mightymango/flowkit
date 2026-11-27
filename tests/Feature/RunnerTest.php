@@ -1,9 +1,9 @@
 <?php
 
-use Act\Flowkit\Engine\FlowBuilder;
-use Act\Flowkit\Enums\RunStatus;
-use Act\Flowkit\Facades\Flowkit;
-use Act\Flowkit\Tests\Fixtures\Bricks\SendMessage;
+use MightyMango\Flowkit\Engine\FlowBuilder;
+use MightyMango\Flowkit\Enums\RunStatus;
+use MightyMango\Flowkit\Facades\Flowkit;
+use MightyMango\Flowkit\Tests\Fixtures\Bricks\SendMessage;
 
 function newStarterFlow()
 {

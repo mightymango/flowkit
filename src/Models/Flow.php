@@ -1,9 +1,9 @@
 <?php
 
-namespace Act\Flowkit\Models;
+namespace MightyMango\Flowkit\Models;
 
-use Act\Flowkit\Engine\Definition;
-use Act\Flowkit\Enums\FlowStatus;
+use MightyMango\Flowkit\Engine\Definition;
+use MightyMango\Flowkit\Enums\FlowStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;

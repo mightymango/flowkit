@@ -9,7 +9,7 @@
  * bg-[var(--flowkit-surface)], so add the package views to Tailwind's
  * content sources:
  *
- *   @source "../../vendor/act/flowkit/resources/views";
+ *   @source "../../vendor/mightymango/flowkit/resources/views";
  */
 
 :root {

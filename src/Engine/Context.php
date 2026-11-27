@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Engine;
+namespace MightyMango\Flowkit\Engine;
 
 use Illuminate\Support\Arr;
 

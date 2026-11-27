@@ -1,10 +1,10 @@
 <?php
 
-namespace Act\Flowkit;
+namespace MightyMango\Flowkit;
 
-use Act\Flowkit\Bricks\Core\ModelEvent;
-use Act\Flowkit\Enums\FlowStatus;
-use Act\Flowkit\Models\Flow;
+use MightyMango\Flowkit\Bricks\Core\ModelEvent;
+use MightyMango\Flowkit\Enums\FlowStatus;
+use MightyMango\Flowkit\Models\Flow;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 

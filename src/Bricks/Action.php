@@ -1,9 +1,9 @@
 <?php
 
-namespace Act\Flowkit\Bricks;
+namespace MightyMango\Flowkit\Bricks;
 
-use Act\Flowkit\Engine\Context;
-use Act\Flowkit\Engine\Result;
+use MightyMango\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Engine\Result;
 
 /**
  * Does the work and returns outputs that later steps can use.

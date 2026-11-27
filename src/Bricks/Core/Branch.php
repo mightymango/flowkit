@@ -1,11 +1,11 @@
 <?php
 
-namespace Act\Flowkit\Bricks\Core;
+namespace MightyMango\Flowkit\Bricks\Core;
 
-use Act\Flowkit\Bricks\Brick;
-use Act\Flowkit\Engine\Context;
-use Act\Flowkit\Engine\Expression;
-use Act\Flowkit\Fields\Text;
+use MightyMango\Flowkit\Bricks\Brick;
+use MightyMango\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Engine\Expression;
+use MightyMango\Flowkit\Fields\Text;
 
 /**
  * If/otherwise. Evaluates `when` and continues down `yes` or `otherwise`.

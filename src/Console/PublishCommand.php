@@ -1,6 +1,6 @@
 <?php
 
-namespace Act\Flowkit\Console;
+namespace MightyMango\Flowkit\Console;
 
 use Composer\InstalledVersions;
 use Illuminate\Console\Command;
@@ -84,13 +84,13 @@ class PublishCommand extends Command
 
     public static function version(): string
     {
-        return class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('act/flowkit')
-            ? (InstalledVersions::getPrettyVersion('act/flowkit') ?? 'dev')
+        return class_exists(InstalledVersions::class) && InstalledVersions::isInstalled('mightymango/flowkit')
+            ? (InstalledVersions::getPrettyVersion('mightymango/flowkit') ?? 'dev')
             : 'dev';
     }
 
     private function header(): string
     {
-        return '{{-- Published from act/flowkit '.self::version().'. This copy overrides the package\'s. --}}'.PHP_EOL;
+        return '{{-- Published from mightymango/flowkit '.self::version().'. This copy overrides the package\'s. --}}'.PHP_EOL;
     }
 }

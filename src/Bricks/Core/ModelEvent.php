@@ -1,10 +1,10 @@
 <?php
 
-namespace Act\Flowkit\Bricks\Core;
+namespace MightyMango\Flowkit\Bricks\Core;
 
-use Act\Flowkit\Bricks\Trigger;
-use Act\Flowkit\Fields\Select;
-use Act\Flowkit\Fields\Text;
+use MightyMango\Flowkit\Bricks\Trigger;
+use MightyMango\Flowkit\Fields\Select;
+use MightyMango\Flowkit\Fields\Text;
 
 /**
  * Fires when a model using HasFlowTriggers is created, updated or deleted.

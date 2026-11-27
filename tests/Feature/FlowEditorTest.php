@@ -1,8 +1,8 @@
 <?php
 
-use Act\Flowkit\Livewire\FlowEditor;
-use Act\Flowkit\Livewire\FlowList;
-use Act\Flowkit\Models\Flow;
+use MightyMango\Flowkit\Livewire\FlowEditor;
+use MightyMango\Flowkit\Livewire\FlowList;
+use MightyMango\Flowkit\Models\Flow;
 use Livewire\Livewire;
 
 it('lists flows', function () {

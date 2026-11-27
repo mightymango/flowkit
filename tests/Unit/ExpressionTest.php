@@ -1,7 +1,7 @@
 <?php
 
-use Act\Flowkit\Engine\Context;
-use Act\Flowkit\Engine\Expression;
+use MightyMango\Flowkit\Engine\Context;
+use MightyMango\Flowkit\Engine\Expression;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 beforeEach(function () {

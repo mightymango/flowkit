@@ -1,5 +1,5 @@
 {
-    "name": "act/flowkit",
+    "name": "mightymango/flowkit",
     "description": "A Zapier-style workflow builder for Laravel Livewire apps: a headless engine, a step-list editor and publishable Blade components.",
     "type": "library",
     "license": "proprietary",
@@ -26,13 +26,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Act\\Flowkit\\": "src/",
-            "Act\\Flowkit\\Database\\": "database/"
+            "MightyMango\\Flowkit\\": "src/",
+            "MightyMango\\Flowkit\\Database\\": "database/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Act\\Flowkit\\Tests\\": "tests/"
+            "MightyMango\\Flowkit\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -41,10 +41,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Act\\Flowkit\\FlowkitServiceProvider"
+                "MightyMango\\Flowkit\\FlowkitServiceProvider"
             ],
             "aliases": {
-                "Flowkit": "Act\\Flowkit\\Facades\\Flowkit"
+                "Flowkit": "MightyMango\\Flowkit\\Facades\\Flowkit"
             }
         }
     },

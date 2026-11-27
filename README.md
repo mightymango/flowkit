@@ -1,6 +1,6 @@
 # Flowkit
 
-A Zapier-style workflow builder for Laravel Livewire apps. `act/flowkit` is a working name.
+A Zapier-style workflow builder for Laravel Livewire apps. `mightymango/flowkit` is a working name.
 
 It has three layers:
 
@@ -13,7 +13,7 @@ It has three layers:
 ## Install
 
 ```bash
-composer require act/flowkit
+composer require mightymango/flowkit
 php artisan migrate
 ```
 
@@ -27,8 +27,8 @@ Gate::define('use-flowkit', fn (User $user) => $user->isAdmin());
 Import the tokens and let Tailwind see the package views:
 
 ```css
-@import "../../vendor/act/flowkit/resources/css/flowkit.css";
-@source "../../vendor/act/flowkit/resources/views";
+@import "../../vendor/mightymango/flowkit/resources/css/flowkit.css";
+@source "../../vendor/mightymango/flowkit/resources/views";
 ```
 
 The editor lives at `/flows`. Point `flowkit.layout` at your own layout (it needs a `content` section and Livewire's assets).
