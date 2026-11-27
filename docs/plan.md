@@ -221,7 +221,6 @@ Phases 1 and 2 deliver something usable inside a host app on their own. Phases 3
 
 **Open questions**
 
-- Whether the package stays internal or is open-sourced. (The name is settled: `mightymango/flowkit`.)
 - Teams messaging through Microsoft Graph needs an Entra app registration and data-protection sign-off before phase 1's notification brick.
 - Whether to fork AutoBuilder's engine (MIT) as a starting point, or start fresh and use it only as a reference.
 
@@ -241,3 +240,6 @@ Our engine already persists the step tree and pins each run to a version, so res
 - Run a `flowkit:resume-due` command every minute. It claims waiting runs whose `resume_at` has passed, with an atomic update so each run is claimed once. This sweeper is what guarantees long waits on every queue driver.
 
 All of this sits behind a `WaitScheduler` interface, so a library adapter can be added later if needed. It's built in the phase 3 durable-waits issue.
+
+**Licence: open source, MIT** (#3, 27 Nov 2026). Published on Packagist as `mightymango/flowkit`. The README is the public documentation.
+

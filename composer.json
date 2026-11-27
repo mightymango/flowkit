@@ -2,7 +2,7 @@
     "name": "mightymango/flowkit",
     "description": "A Zapier-style workflow builder for Laravel Livewire apps: a headless engine, a step-list editor and publishable Blade components.",
     "type": "library",
-    "license": "proprietary",
+    "license": "MIT",
     "keywords": ["laravel", "livewire", "workflow", "automation"],
     "authors": [
         {
