@@ -271,6 +271,18 @@ Flowkit::assertActionNotRan('hr.update-record');
 
 The callback gets the step's resolved settings, its output and the `FlowRunStep`. An action whose settings failed validation, or an unsafe action replaced by its dry run, doesn't count as having run. The fake listens for the runner's `StepFinished` event, so don't use `Event::fake()` for that event in the same test. The helpers use plain PHPUnit assertions, so they work with Pest or PHPUnit; `runFlow()` is autoloaded with the package and is skipped if your app already defines a function of that name (use `new MightyMango\Flowkit\Testing\TestRun(Flowkit::run(...))` instead).
 
+Under the fake, `Flowkit::retry($run)` and `flowkit:retry` record the retry rather than running it. As with a real retry, a run that hasn't failed is refused, and a retried run goes back to `pending`:
+
+```php
+Flowkit::fake();
+
+Flowkit::retry($run);
+
+Flowkit::assertRetried($run);
+Flowkit::assertNotRetried($otherRun);
+Flowkit::assertNothingRetried();
+```
+
 ### Testing the package
 
 ```bash

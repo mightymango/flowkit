@@ -64,13 +64,21 @@ class Flowkit
      */
     public function retry(FlowRun $run): FlowRun
     {
+        RunFlow::dispatch($this->prepareRetry($run));
+
+        return $run;
+    }
+
+    /**
+     * Check a run can be retried and put it back to pending.
+     */
+    protected function prepareRetry(FlowRun $run): FlowRun
+    {
         if ($run->status !== RunStatus::Failed) {
             throw new RuntimeException("Run #{$run->id} hasn't failed, so it can't be retried.");
         }
 
         $run->forceFill(['status' => RunStatus::Pending, 'finished_at' => null])->save();
-
-        RunFlow::dispatch($run);
 
         return $run;
     }

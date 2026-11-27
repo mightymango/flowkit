@@ -15,7 +15,8 @@ use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
  * Swapped in by Flowkit::fake(). Like Queue::fake(), runs started with
- * start() or test() are recorded as pending and never executed. Runs started
+ * start() or test(), and runs resumed with retry(), are recorded as pending
+ * and never executed. Runs started
  * with run() (and so runFlow()) still execute in this process, and every
  * action whose handle() runs is recorded for assertActionRan(), from the
  * runner's StepFinished events. (Event::fake() stops those events, so don't
@@ -25,6 +26,9 @@ class FlowkitFake extends Flowkit implements Fake
 {
     /** @var list<array{flow: string, payload: array, run: FlowRun}> */
     protected array $started = [];
+
+    /** @var list<FlowRun> */
+    protected array $retried = [];
 
     /** @var list<StepFinished> */
     protected array $steps = [];
@@ -51,6 +55,50 @@ class FlowkitFake extends Flowkit implements Fake
     public function run(Flow|string $flow, array $payload = [], bool $dryRun = false): FlowRun
     {
         return $this->execute($this->record($this->createRun($flow, $payload, $dryRun)));
+    }
+
+    /**
+     * Records the retry without running it. Like a real retry, it refuses a
+     * run that hasn't failed and puts the run back to pending.
+     */
+    public function retry(FlowRun $run): FlowRun
+    {
+        $this->retried[] = $this->prepareRetry($run);
+
+        return $run;
+    }
+
+    public function assertRetried(FlowRun $run): void
+    {
+        PHPUnit::assertTrue(
+            $this->retried()->contains(fn (FlowRun $retried) => $retried->is($run)),
+            "Run #{$run->id} was not retried."
+        );
+    }
+
+    public function assertNotRetried(FlowRun $run): void
+    {
+        PHPUnit::assertFalse(
+            $this->retried()->contains(fn (FlowRun $retried) => $retried->is($run)),
+            "Run #{$run->id} was retried unexpectedly."
+        );
+    }
+
+    public function assertNothingRetried(): void
+    {
+        $ids = $this->retried()->map(fn (FlowRun $run) => "#{$run->id}")->implode(', ');
+
+        PHPUnit::assertEmpty($this->retried, "Runs were retried unexpectedly: {$ids}.");
+    }
+
+    /**
+     * Runs retried since the fake was swapped in.
+     *
+     * @return Collection<int, FlowRun>
+     */
+    public function retried(): Collection
+    {
+        return collect($this->retried);
     }
 
     /**

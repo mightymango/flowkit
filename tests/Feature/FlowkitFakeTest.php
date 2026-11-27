@@ -131,3 +131,48 @@ it('can be faked twice without wrapping a fake', function () {
 
     expect($fake->real())->not->toBeInstanceOf(FlowkitFake::class);
 });
+
+it('records a retry without running it', function () {
+    config(['flowkit.retries.tries' => 1]);
+    Flaky::$failures = 1;
+    Flowkit::define('flaky')->trigger('core.manual')->step('s1', 'test.flaky', [])->save();
+    $run = Flowkit::run('flaky');
+    $other = Flowkit::run('flaky');
+
+    Flowkit::fake();
+    Flowkit::assertNothingRetried();
+
+    Flowkit::retry($run);
+
+    Flowkit::assertRetried($run);
+    Flowkit::assertNotRetried($other);
+    expect(Flaky::$calls)->toBe(2)
+        ->and($run->refresh()->status)->toBe(RunStatus::Pending)
+        ->and(Flowkit::retried())->toHaveCount(1)
+        ->and(fn () => Flowkit::assertNothingRetried())->toThrow(AssertionFailedError::class)
+        ->and(fn () => Flowkit::assertRetried($other))->toThrow(AssertionFailedError::class);
+});
+
+it('still refuses to retry a run that has not failed under the fake', function () {
+    $run = Flowkit::run('welcome', ['name' => 'Ana']);
+
+    Flowkit::fake();
+
+    expect(fn () => Flowkit::retry($run))->toThrow(RuntimeException::class);
+    Flowkit::assertNothingRetried();
+});
+
+it('records a retry from the command line under the fake', function () {
+    config(['flowkit.retries.tries' => 1]);
+    Flaky::$failures = 1;
+    Flowkit::define('flaky')->trigger('core.manual')->step('s1', 'test.flaky', [])->save();
+    $run = Flowkit::run('flaky');
+
+    Flowkit::fake();
+
+    $this->artisan('flowkit:retry', ['run' => $run->id])->assertSuccessful();
+
+    Flowkit::assertRetried($run);
+    expect(Flaky::$calls)->toBe(1);
+});
+
