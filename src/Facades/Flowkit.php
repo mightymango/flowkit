@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \MightyMango\Flowkit\Models\FlowRun start(\MightyMango\Flowkit\Models\Flow|string $flow, array $payload = [], bool $dryRun = false)
  * @method static \MightyMango\Flowkit\Models\FlowRun run(\MightyMango\Flowkit\Models\Flow|string $flow, array $payload = [], bool $dryRun = false)
  * @method static \MightyMango\Flowkit\Models\FlowRun test(\MightyMango\Flowkit\Models\Flow|string $flow, array $payload = [])
+ * @method static \MightyMango\Flowkit\Models\FlowRun retry(\MightyMango\Flowkit\Models\FlowRun $run)
  * @method static void assertStarted(\MightyMango\Flowkit\Models\Flow|string $flow, ?callable $callback = null)
  * @method static void assertStartedTimes(\MightyMango\Flowkit\Models\Flow|string $flow, int $times)
  * @method static void assertNotStarted(\MightyMango\Flowkit\Models\Flow|string $flow, ?callable $callback = null)
@@ -22,6 +23,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static void assertActionNotRan(string $brick, ?callable $callback = null)
  * @method static \Illuminate\Support\Collection started(\MightyMango\Flowkit\Models\Flow|string|null $flow = null)
  * @method static \Illuminate\Support\Collection actions(?string $brick = null)
+ * @method static void assertRetried(\MightyMango\Flowkit\Models\FlowRun $run)
+ * @method static void assertNotRetried(\MightyMango\Flowkit\Models\FlowRun $run)
+ * @method static void assertNothingRetried()
+ * @method static \Illuminate\Support\Collection retried()
  *
  * @see \MightyMango\Flowkit\Flowkit
  * @see \MightyMango\Flowkit\Testing\FlowkitFake
