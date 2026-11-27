@@ -37,9 +37,12 @@ class FlowRun extends Model
         return $this->hasMany(FlowRunStep::class)->orderBy('id');
     }
 
+    /**
+     * The latest attempt at a step.
+     */
     public function step(string $stepId): ?FlowRunStep
     {
-        return $this->steps()->where('step_id', $stepId)->latest('id')->first();
+        return $this->steps()->reorder()->where('step_id', $stepId)->latest('id')->first();
     }
 
     /**

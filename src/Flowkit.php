@@ -58,6 +58,24 @@ class Flowkit
     }
 
     /**
+     * Resume a failed run from the step that failed. Steps that completed
+     * are not run again. This retries any action, including one that isn't
+     * safe to repeat, so check what the failed step did first.
+     */
+    public function retry(FlowRun $run): FlowRun
+    {
+        if ($run->status !== RunStatus::Failed) {
+            throw new RuntimeException("Run #{$run->id} hasn't failed, so it can't be retried.");
+        }
+
+        $run->forceFill(['status' => RunStatus::Pending, 'finished_at' => null])->save();
+
+        RunFlow::dispatch($run);
+
+        return $run;
+    }
+
+    /**
      * Run against the flow with unsafe actions in dry-run mode, logging what
      * each would have done.
      */
