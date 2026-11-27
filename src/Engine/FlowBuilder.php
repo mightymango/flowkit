@@ -10,7 +10,7 @@ use Closure;
  *
  *   Flowkit::define('new-starter')
  *       ->name('New starter')
- *       ->trigger('people.employee-created')
+ *       ->trigger('app.employee-created')
  *       ->branch('s1', "employee.department == 'Delivery'",
  *           yes: fn (FlowBuilder $b) => $b->step('s2', 'core.wait', ['duration' => 'P7D']),
  *       )

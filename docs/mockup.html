@@ -17,7 +17,7 @@ input,select,textarea{font:inherit}
 
 <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 32px; background: #FFFFFF; border-bottom: 1px solid #E3E6EB">
 <div style="display: flex; flex-direction: column; gap: 4px">
-<nav aria-label="Breadcrumb" style="font-size: 13px; color: #5B6270"><a href="#">Workflows</a> / People</nav>
+<nav aria-label="Breadcrumb" style="font-size: 13px; color: #5B6270"><a href="#">Workflows</a> / Onboarding</nav>
 <div style="display: flex; align-items: center; gap: 12px">
 <h1 style="margin: 0; font-size: 20px; font-weight: 700">New starter onboarding</h1>
 <span style="font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: #FDF0E3; color: #8A4306">Draft · v3</span>
@@ -39,7 +39,7 @@ input,select,textarea{font:inherit}
 <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
 <span style="font-size: 12px; font-weight: 600; color: #1E46B0; text-transform: uppercase; letter-spacing: 0.04em">When</span>
 <strong style="font-size: 15px">An Employee is created</strong>
-<span style="color: #5B6270">Model event · People app · runs on queue</span>
+<span style="color: #5B6270">Model event · runs on queue</span>
 </div>
 </div>
 
@@ -63,7 +63,7 @@ input,select,textarea{font:inherit}
 <span style="color: #5B6270">To employee.manager</span>
 </div>
 <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px">
-<span style="font-size: 12px; font-weight: 600; color: #1D6B45">ACTION · People</span>
+<span style="font-size: 12px; font-weight: 600; color: #1D6B45">ACTION · Checklists</span>
 <strong>Create induction checklist</strong>
 <span style="color: #5B6270">Template: Delivery staff</span>
 </div>
@@ -72,7 +72,7 @@ input,select,textarea{font:inherit}
 <div style="display: flex; flex-direction: column; gap: 10px">
 <span style="font-size: 12px; font-weight: 700; color: #5B6270">OTHERWISE</span>
 <div style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 3px">
-<span style="font-size: 12px; font-weight: 600; color: #1D6B45">ACTION · People</span>
+<span style="font-size: 12px; font-weight: 600; color: #1D6B45">ACTION · Checklists</span>
 <strong>Create induction checklist</strong>
 <span style="color: #5B6270">Template: Central services</span>
 </div>
@@ -116,7 +116,7 @@ input,select,textarea{font:inherit}
 </div>
 <div style="display: flex; flex-direction: column; gap: 6px">
 <label for="msg" style="font-weight: 600; font-size: 13px">Message</label>
-<textarea id="msg" rows="4" style="padding: 10px 12px; border: 1px solid #D5D9E0; border-radius: 8px; resize: vertical; color: #16181D">Hi, {{ employee.name }} starts on {{ employee.start_date }}. Their induction checklist is ready in People.</textarea>
+<textarea id="msg" rows="4" style="padding: 10px 12px; border: 1px solid #D5D9E0; border-radius: 8px; resize: vertical; color: #16181D">Hi, {{ employee.name }} starts on {{ employee.start_date }}. Their induction checklist is ready.</textarea>
 <span style="font-size: 12px; color: #5B6270">Insert a variable:</span>
 <div style="display: flex; flex-wrap: wrap; gap: 6px">
 <button style="min-height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid #D5D9E0; background: #F6F7F9; color: #16181D; font-size: 12px; font-family: ui-monospace, monospace">employee.name</button>

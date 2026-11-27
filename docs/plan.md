@@ -14,7 +14,7 @@ The key decisions:
 - **Bricks (triggers, conditions, actions) are PHP classes** that declare their own settings fields. The settings panel is built from that declaration, so a new brick needs no Blade.
 - **Delays and waits run on an existing durable-workflow library** such as laravel-workflow, not a homegrown scheduler.
 
-**Recommendation:** build the engine and a minimal editor first (phases 1–2), prove them inside People, and only then invest in the publishing and theming layer.
+**Recommendation:** build the engine and a minimal editor first (phases 1–2), prove them inside a first host app, and only then invest in the publishing and theming layer.
 
 ## Package structure
 
@@ -73,7 +73,7 @@ Runs always point at a version, never at the flow. Editing a flow creates a new 
 
 ```json
 {
-  "trigger": { "brick": "people.employee-created", "settings": {} },
+  "trigger": { "brick": "app.employee-created", "settings": {} },
   "steps": [
     { "id": "s1", "brick": "core.branch",
       "settings": { "when": "employee.department == 'Delivery'" },
@@ -182,7 +182,7 @@ class SendTeamsMessage extends Action
 
 ## Governance, security and testing
 
-Staff-authored automation that touches HR and learner data needs controls built in from the start, not bolted on later.
+Staff-authored automation that touches personal data needs controls built in from the start, not bolted on later.
 
 **Governance**
 
@@ -212,12 +212,12 @@ The plan has four phases, each ending with a gate. Don't start a phase until the
 
 | Phase | Scope | Gate |
 | --- | --- | --- |
-| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | A People flow is live |
+| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | A flow is live in a host app |
 | 2. Editor | Step-list editor, settings from fields, run history, dry-run testing | Staff build a flow unaided |
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | Governance sign-off |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, component prop docs | A second app adopts it |
 
-Phases 1 and 2 deliver something usable inside People on their own. Phases 3 and 4 make it safe for staff to edit flows and reusable in other apps.
+Phases 1 and 2 deliver something usable inside a host app on their own. Phases 3 and 4 make it safe for staff to edit flows and reusable in other apps.
 
 **Open questions**
 

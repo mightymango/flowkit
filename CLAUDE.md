@@ -1,6 +1,6 @@
 # Flowkit
 
-A Zapier-style workflow builder package for Laravel Livewire apps: `mightymango/flowkit`, namespace `MightyMango\Flowkit`. The first host app is **People**.
+A Zapier-style workflow builder package for Laravel Livewire apps: `mightymango/flowkit`, namespace `MightyMango\Flowkit`.
 
 - `docs/plan.md` is the design and the source of truth for intent. Read it before starting an issue.
 - `docs/mockup.html` is the target look for the editor (step list on the left, settings panel on the right).
@@ -35,7 +35,7 @@ CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.4 against Livewire 3 and 4. 
 - **Unsafe actions** (`$retrySafe = false`) must use `$context->idempotencyKey($stepId)` and must not run for real in dry-run mode.
 - **Blade components:** take data as props and merge `$attributes` onto the root element. Style with Tailwind classes that reference the `--flowkit-*` tokens in `resources/css/flowkit.css`. Treat a prop change as a breaking change once phase 4 starts.
 - **Laravel 12 only.** Every Laravel 11 release is blocked by Composer's security-advisory policy; don't re-add 11 to the constraints or CI.
-- Run data can contain personal data (HR and learner records). Don't log payloads, and keep retention in mind.
+- Run data can contain personal data (e.g. employee or customer records). Don't log payloads, and keep retention in mind.
 
 ## Conventions
 

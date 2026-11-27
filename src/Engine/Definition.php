@@ -12,7 +12,7 @@ use JsonSerializable;
  * holds named child step lists, e.g. `yes` and `otherwise`.
  *
  *   {
- *     "trigger": { "brick": "people.employee-created", "settings": {} },
+ *     "trigger": { "brick": "app.employee-created", "settings": {} },
  *     "steps": [
  *       { "id": "s1", "brick": "core.branch", "settings": { "when": "..." },
  *         "branches": { "yes": [...], "otherwise": [...] } }
