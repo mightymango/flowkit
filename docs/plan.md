@@ -8,6 +8,7 @@ Build one Composer package, `mightymango/flowkit` (PHP namespace `MightyMango\Fl
 
 The key decisions:
 
+- **No Vue, React or other front-end framework.** The editor is Livewire and Blade, plus the Alpine that Livewire already ships. Reordering uses `wire:sort`, and the package has no npm build of its own.
 - **Engine and UI are separate.** The engine has no UI dependency, so flows can be built, tested and run from code. The editor is one way to produce a flow definition, not the only one.
 - **Every visible element is an anonymous Blade component.** `php artisan flowkit:publish step-card` copies that file into `resources/views/flowkit/`, and the app's copy wins. This mirrors `flux:publish`.
 - **Theming uses CSS custom properties and Tailwind**, so most restyling needs no published files at all. Publish a component only to change its markup.
