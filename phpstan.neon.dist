@@ -2,9 +2,11 @@ includes:
     - vendor/larastan/larastan/extension.neon
 
 parameters:
-    level: 6
+    level: 5
     paths:
         - src
         - config
         - database
+    databaseMigrationsPath:
+        - database/migrations
     tmpDir: build/phpstan
