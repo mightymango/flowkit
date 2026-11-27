@@ -19,6 +19,12 @@ use Throwable;
  */
 class Runner
 {
+    /**
+     * Internal signal from a failed standalone condition: stop walking and
+     * finish the run as completed. Never stored.
+     */
+    private const STOPPED = 'stopped';
+
     public function __construct(
         private BrickRegistry $bricks,
         private Expression $expression,
@@ -40,6 +46,7 @@ class Runner
         $run->forceFill(['status' => RunStatus::Running, 'started_at' => $run->started_at ?? now()])->save();
 
         $outcome = $this->walk($definition->steps, $context, $run);
+        $outcome = $outcome === self::STOPPED ? RunStatus::Completed : $outcome;
 
         $run->forceFill([
             'status' => $outcome,
@@ -51,14 +58,14 @@ class Runner
     }
 
     /**
-     * Run a list of steps in order. Stops early if a step waits or fails.
+     * Run a list of steps in order. Stops early if a step waits or fails, or a standalone condition fails.
      */
-    private function walk(array $steps, Context $context, FlowRun $run): RunStatus
+    private function walk(array $steps, Context $context, FlowRun $run): RunStatus|string
     {
         foreach ($steps as $step) {
             $status = $this->runStep($step, $context, $run);
 
-            if ($status === RunStatus::Waiting || $status === RunStatus::Failed) {
+            if ($status === self::STOPPED || $status === RunStatus::Waiting || $status === RunStatus::Failed) {
                 return $status;
             }
         }
@@ -66,7 +73,7 @@ class Runner
         return RunStatus::Completed;
     }
 
-    private function runStep(array $step, Context $context, FlowRun $run): RunStatus
+    private function runStep(array $step, Context $context, FlowRun $run): RunStatus|string
     {
         $started = hrtime(true);
         $record = new FlowRunStep([
@@ -81,7 +88,7 @@ class Runner
             $settings = $this->expression->resolve($step['settings'] ?? [], $context);
             $record->input = $settings;
 
-            $validator = Validator::make($settings, $brick->rules());
+            $validator = Validator::make($settings, $brick->rulesFor($settings));
             if ($validator->fails()) {
                 return $this->finish($record, $started, RunStatus::Failed, error: implode(' ', $validator->errors()->all()));
             }
@@ -94,11 +101,15 @@ class Runner
                 return $this->walk($step['branches'][$chosen] ?? [], $context, $run);
             }
 
+            // A condition on its own is a filter: if it fails, the run stops
+            // here and completes without running the steps after it.
             if ($brick instanceof Condition) {
                 $passed = $brick->check($context, $settings);
-                $context->recordOutput($step['id'], ['passed' => $passed]);
+                $output = $passed ? ['passed' => true] : ['passed' => false, 'stopped' => true];
+                $context->recordOutput($step['id'], $output);
+                $this->finish($record, $started, RunStatus::Completed, $output);
 
-                return $this->finish($record, $started, RunStatus::Completed, ['passed' => $passed]);
+                return $passed ? RunStatus::Completed : self::STOPPED;
             }
 
             if (! $brick instanceof Action) {
