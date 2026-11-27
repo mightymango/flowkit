@@ -54,6 +54,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Notifications
+    |--------------------------------------------------------------------------
+    |
+    | `core.notify` looks user recipients up by id on this model. Leave it
+    | null to use the model of the default guard's user provider. The model
+    | must use the Notifiable trait.
+    |
+    */
+
+    'notify' => [
+        'user_model' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue
     |--------------------------------------------------------------------------
     */
