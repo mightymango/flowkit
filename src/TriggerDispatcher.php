@@ -6,6 +6,7 @@ use MightyMango\Flowkit\Bricks\Core\ModelEvent;
 use MightyMango\Flowkit\Enums\FlowStatus;
 use MightyMango\Flowkit\Models\Flow;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 /**
@@ -15,7 +16,10 @@ class TriggerDispatcher
 {
     public function __construct(private Flowkit $flowkit) {}
 
-    public function modelEvent(Model $model, string $event): void
+    /**
+     * @param  array<string, array{from: mixed, to: mixed}>  $changes  for `changed`: attribute => old and new values
+     */
+    public function modelEvent(Model $model, string $event, array $changes = []): void
     {
         $alias = Str::snake(class_basename($model));
         $payload = [
@@ -23,9 +27,31 @@ class TriggerDispatcher
             'event' => $event,
         ];
 
-        $this->fire(ModelEvent::$key, $payload, function (array $settings) use ($model, $event) {
-            return ltrim($settings['model'] ?? '', '\\') === $model::class
-                && ($settings['event'] ?? null) === $event;
+        if ($event === 'changed') {
+            $payload['changes'] = $changes;
+        }
+
+        $rules = app(ModelEvent::class)->rules();
+
+        $this->fire(ModelEvent::$key, $payload, function (array $settings) use ($model, $event, $changes, $rules) {
+            // Never trust a stored definition: a trigger with invalid settings matches nothing.
+            if (Validator::make($settings, $rules)->fails()) {
+                return false;
+            }
+
+            if (ltrim($settings['model'] ?? '', '\\') !== $model::class || ($settings['event'] ?? null) !== $event) {
+                return false;
+            }
+
+            if ($event !== 'changed') {
+                return true;
+            }
+
+            $change = $changes[$settings['attribute'] ?? ''] ?? null;
+
+            return $change !== null
+                && $this->valueMatches($settings['from'] ?? null, $change['from'])
+                && $this->valueMatches($settings['to'] ?? null, $change['to']);
         });
     }
 
@@ -60,5 +86,15 @@ class TriggerDispatcher
             });
 
         return $started;
+    }
+
+    /** An empty filter matches any value; otherwise compare as strings. */
+    private function valueMatches(?string $expected, mixed $actual): bool
+    {
+        if ($expected === null || $expected === '') {
+            return true;
+        }
+
+        return is_scalar($actual) && (string) $actual === $expected;
     }
 }
