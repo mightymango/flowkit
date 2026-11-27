@@ -65,6 +65,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Retries
+    |--------------------------------------------------------------------------
+    |
+    | When an action throws, the step is tried again after a backoff, up to
+    | 'tries' attempts in all. 'backoff' is the wait in seconds before each
+    | retry; the last value repeats. Actions that aren't safe to retry get one
+    | attempt, unless they declare $usesIdempotencyKey. An action can set its
+    | own static $tries.
+    |
+    */
+
+    'retries' => [
+        'tries' => 3,
+        'backoff' => [10, 60, 300],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Governance
     |--------------------------------------------------------------------------
     |

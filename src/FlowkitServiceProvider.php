@@ -6,6 +6,7 @@ use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core;
 use MightyMango\Flowkit\Console\MakeBrickCommand;
 use MightyMango\Flowkit\Console\PublishCommand;
+use MightyMango\Flowkit\Console\RetryCommand;
 use MightyMango\Flowkit\Console\RunCommand;
 use MightyMango\Flowkit\Engine\Expression;
 use MightyMango\Flowkit\Engine\Runner;
@@ -58,7 +59,7 @@ class FlowkitServiceProvider extends ServiceProvider
         $this->registerGate();
 
         if ($this->app->runningInConsole()) {
-            $this->commands([PublishCommand::class, MakeBrickCommand::class, RunCommand::class]);
+            $this->commands([PublishCommand::class, MakeBrickCommand::class, RunCommand::class, RetryCommand::class]);
 
             $this->publishes([
                 __DIR__.'/../config/flowkit.php' => config_path('flowkit.php'),
