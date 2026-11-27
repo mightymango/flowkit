@@ -28,6 +28,7 @@ class FlowkitServiceProvider extends ServiceProvider
         Core\Branch::class,
         Core\Wait::class,
         Core\SetVariable::class,
+        Core\Notify::class,
     ];
 
     /** Livewire components, by name under the `flowkit.` prefix. */

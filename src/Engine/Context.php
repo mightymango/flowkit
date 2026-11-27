@@ -11,6 +11,9 @@ use Illuminate\Support\Arr;
  */
 final class Context
 {
+    /** The step being run, when the runner has said which one it is. */
+    private ?string $stepId = null;
+
     public function __construct(
         private array $data = [],
         public readonly ?int $runId = null,
@@ -39,6 +42,22 @@ final class Context
         $this->data['steps'][$stepId] = $output;
 
         return $this;
+    }
+
+    /**
+     * Mark which step is about to run, so an action can find its own step
+     * id, e.g. for idempotencyKey().
+     */
+    public function forStep(?string $stepId): self
+    {
+        $this->stepId = $stepId;
+
+        return $this;
+    }
+
+    public function stepId(): ?string
+    {
+        return $this->stepId;
     }
 
     /**

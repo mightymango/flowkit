@@ -116,6 +116,8 @@ class Runner
                 throw new LogicException("Brick [{$step['brick']}] can't be used as a step.");
             }
 
+            $context->forStep($step['id']);
+
             $result = $context->dryRun && ! $brick::$retrySafe
                 ? $brick->dryRun($context, $settings)
                 : $brick->handle($context, $settings);

@@ -174,7 +174,9 @@ Flowkit::define('managers')
     ->save();
 ```
 
-Core bricks: `core.manual`, `core.model-event`, `core.schedule`, `core.branch`, `core.wait`, `core.set-variable`.
+Core bricks: `core.manual`, `core.model-event`, `core.schedule`, `core.branch`, `core.wait`, `core.set-variable`, `core.notify`.
+
+`core.notify` sends an email to a user (a user id from a variable, looked up on `flowkit.notify.user_model` or the auth provider's model) or to an email address. The subject and message take `{{ variables }}`; the message is sent as plain text, never rendered as Blade. A dry run shows what would be sent, and the step's idempotency key stops a retry from sending twice.
 
 ## Customisation
 
