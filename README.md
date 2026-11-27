@@ -39,6 +39,16 @@ Import the tokens and let Tailwind see the package views:
 
 The editor lives at `/flows`. Point `flowkit.layout` at your own layout (it needs a `content` section and Livewire's assets).
 
+### Multi-tenant apps
+
+Flowkit has no tenancy code of its own. It uses the default database connection, queue and cache, so it works inside whatever tenant your tenancy package has initialised. With a database per tenant (e.g. stancl/tenancy):
+
+- **Migrations:** set `'migrations' => false` in `config/flowkit.php`, so `php artisan migrate` doesn't create Flowkit's tables in the central database. Then add `vendor/mightymango/flowkit/database/migrations` to your tenant migration paths. With stancl/tenancy, that's `tenancy.migration_parameters.--path`.
+- **Queued runs:** these need to run in the right tenant. stancl/tenancy's `QueueTenancyBootstrapper` does this for Flowkit's jobs.
+- **Scheduled flows:** run the tick for every tenant: `Schedule::command('tenants:run flowkit:tick')->everyMinute()`.
+- **Code-first flows:** save them inside each tenant, e.g. from a tenant migration or `tenants:run`. `Flowkit::define(...)->save()` doesn't publish a new version if the definition hasn't changed, so it's safe to run again.
+- **The editor:** its routes need your tenant middleware. Set `flowkit.routes.middleware`, or set `flowkit.routes.enabled` to false and register the routes yourself.
+
 ## Flows
 
 A flow is a trigger plus an ordered list of steps. Branch steps hold named child lists.
