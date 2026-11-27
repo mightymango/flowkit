@@ -80,6 +80,19 @@ class Employee extends Model
 }
 ```
 
+### Scheduled flows
+
+The `core.schedule` trigger starts a flow on a cron expression, such as `0 9 * * 1` for 9am every Monday, with an optional time zone (the app's by default). The run gets `schedule.scheduled_at` and `schedule.timezone`.
+
+Schedule the tick command once in your app; it starts every live, unpaused flow that is due:
+
+```php
+// routes/console.php
+Schedule::command('flowkit:tick')->everyMinute();
+```
+
+It's safe to run on several servers or to let ticks overlap: each flow is claimed for a minute with an atomic update to `flows.last_scheduled_at`, so it starts once. Missed minutes (if the scheduler was down) aren't caught up.
+
 ### Expressions
 
 Conditions and `{{ templates }}` are evaluated with Symfony ExpressionLanguage, never `eval` or Blade. No functions are registered. Each step's output is available to later steps as `steps.<id>.<key>`.
@@ -118,7 +131,7 @@ class SendTeamsMessage extends Action
 
 Bricks in `app/Flows` are discovered automatically; others can be listed in `config/flowkit.php`.
 
-Core bricks: `core.manual`, `core.model-event`, `core.branch`, `core.wait`, `core.set-variable`.
+Core bricks: `core.manual`, `core.model-event`, `core.schedule`, `core.branch`, `core.wait`, `core.set-variable`.
 
 ## Customisation
 
@@ -142,7 +155,7 @@ composer test
 
 | Phase | Scope | In this scaffold |
 | --- | --- | --- |
-| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | ✅ Mostly. Durable resume after `core.wait` is still to do |
+| 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | ✅ Mostly, including scheduled triggers. Durable resume after `core.wait` is still to do |
 | 2. Editor | Step-list editor, settings from fields, run history, dry-run testing | 🟡 Editor and dry runs; run history UI and `wire:sort` reordering to do |
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | ⬜ Config hooks only |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, prop docs | 🟡 Publish and tokens; `flowkit:outdated` to do |
