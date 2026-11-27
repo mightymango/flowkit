@@ -12,7 +12,7 @@ The key decisions:
 - **Every visible element is an anonymous Blade component.** `php artisan flowkit:publish step-card` copies that file into `resources/views/flowkit/`, and the app's copy wins. This mirrors `flux:publish`.
 - **Theming uses CSS custom properties and Tailwind**, so most restyling needs no published files at all. Publish a component only to change its markup.
 - **Bricks (triggers, conditions, actions) are PHP classes** that declare their own settings fields. The settings panel is built from that declaration, so a new brick needs no Blade.
-- **Delays and waits run on an existing durable-workflow library** such as laravel-workflow, not a homegrown scheduler.
+- **Delays and waits are resumed by Flowkit itself**: a `resume_at` time on the run, a delayed resume job, and a scheduled sweeper. It sits behind a `WaitScheduler` interface, so a durable-workflow library can be plugged in later (see [Decisions](#decisions)).
 
 **Recommendation:** build the engine and a minimal editor first (phases 1–2), prove them inside a first host app, and only then invest in the publishing and theming layer.
 
@@ -84,7 +84,7 @@ Runs always point at a version, never at the flow. Editing a flow creates a new 
 }
 ```
 
-**Runner.** A trigger listener creates a `FlowRun` and dispatches a job. The runner walks the step list, resolves each step's settings against the context, calls the brick, writes a `flow_run_steps` row and merges the output into the context. Waits hand off to the durable-workflow layer, which resumes the run later.
+**Runner.** A trigger listener creates a `FlowRun` and dispatches a job. The runner walks the step list, resolves each step's settings against the context, calls the brick, writes a `flow_run_steps` row and merges the output into the context. Waits hand off to the `WaitScheduler`, which resumes the run later.
 
 **Expressions.** Templated strings, such as `{{ employee.name }}`, and conditions are evaluated with Symfony ExpressionLanguage against a whitelisted context. They are never evaluated with `eval` or Blade.
 
@@ -222,10 +222,22 @@ Phases 1 and 2 deliver something usable inside a host app on their own. Phases 3
 **Open questions**
 
 - Whether the package stays internal or is open-sourced. (The name is settled: `mightymango/flowkit`.)
-- Which durable-workflow library to use, and whether it fits your current queue driver.
 - Teams messaging through Microsoft Graph needs an Entra app registration and data-protection sign-off before phase 1's notification brick.
 - Whether to fork AutoBuilder's engine (MIT) as a starting point, or start fresh and use it only as a reference.
 
 ## Decisions
 
 **Minimum Livewire version: 4** (#1, 27 Nov 2026). Flowkit requires `livewire/livewire ^4.0`. The editor reorders steps with `wire:sort`, so there's no SortableJS. CI tests Livewire 4 only. At the time, the one host app checked (mangofolio) was already on Livewire 4.2, and Livewire 4.0 had been out since January 2026.
+
+**Waits: our own scheduler, no durable-workflow library** (#2, 27 Nov 2026). We compared:
+
+- **durable-workflow/workflow**, the successor to laravel-workflow. It needs Laravel `^12.72|^13.41`, ships 83 migrations and needs real queue workers. It also expects to own execution history through deterministic replay, which would duplicate `flow_runs` and `flow_run_steps` and mean rewriting the runner.
+- **Temporal**, with keepsuit/laravel-temporal. It needs a Temporal server and RoadRunner for every host app.
+
+Our engine already persists the step tree and pins each run to a version, so resuming is "load the run and carry on after the wait step". The design:
+
+- Store `resume_at` on `flow_runs`.
+- Dispatch a `ResumeRun` job delayed by `min(wait, 15 minutes)` as a fast path. SQS caps job delays at 15 minutes.
+- Run a `flowkit:resume-due` command every minute. It claims waiting runs whose `resume_at` has passed, with an atomic update so each run is claimed once. This sweeper is what guarantees long waits on every queue driver.
+
+All of this sits behind a `WaitScheduler` interface, so a library adapter can be added later if needed. It's built in the phase 3 durable-waits issue.
