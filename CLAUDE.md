@@ -14,7 +14,7 @@ composer test          # Pest, via Orchestra Testbench (sqlite in memory)
 vendor/bin/pest --filter=RunnerTest
 ```
 
-CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.5 against Laravel 12 and 13 and Livewire 3 and 4 (Laravel 13 needs PHP 8.3+). Keep it green. If Packagist isn't reachable from your environment, push a branch and read the Actions results instead.
+CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.5 against Laravel 12 and 13 with Livewire 4 (Laravel 13 needs PHP 8.3+). Keep it green. If Packagist isn't reachable from your environment, push a branch and read the Actions results instead.
 
 ## Architecture
 
