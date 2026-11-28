@@ -24,6 +24,8 @@ class FlowkitServiceProvider extends ServiceProvider
     /** The package's migrations, for apps that run them from their own path. */
     public const MIGRATIONS_PATH = __DIR__.'/../database/migrations';
 
+    public const LANG_PATH = __DIR__.'/../lang';
+
     /** Bricks every app gets. */
     public const CORE_BRICKS = [
         Core\Manual::class,
@@ -61,6 +63,7 @@ class FlowkitServiceProvider extends ServiceProvider
         }
 
         $this->registerViews();
+        $this->registerTranslations();
         $this->registerLivewireComponents();
         $this->registerBricks();
         $this->registerRoutes();
@@ -80,6 +83,10 @@ class FlowkitServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/css/flowkit.css' => resource_path('css/flowkit.css'),
             ], 'flowkit-css');
+
+            $this->publishes([
+                self::LANG_PATH => $this->app->langPath('vendor/flowkit'),
+            ], 'flowkit-lang');
         }
     }
 
@@ -88,6 +95,17 @@ class FlowkitServiceProvider extends ServiceProvider
      * own, so a file published to resources/views/flowkit wins and every
      * other component still comes from the package. Same mechanism as Flux.
      */
+    /**
+     * Flowkit's own text lives in `flowkit::` PHP files. Core bricks' labels
+     * are plain English translated through JSON, so the package's JSON is
+     * loaded too; an app's own JSON translations win over it.
+     */
+    protected function registerTranslations(): void
+    {
+        $this->loadTranslationsFrom(self::LANG_PATH, 'flowkit');
+        $this->loadJsonTranslationsFrom(self::LANG_PATH);
+    }
+
     protected function registerViews(): void
     {
         Blade::anonymousComponentPath(resource_path('views/flowkit'), 'flowkit');

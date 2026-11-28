@@ -58,9 +58,9 @@ abstract class Brick
     {
         return [
             'key' => static::$key,
-            'label' => static::$label,
-            'group' => static::$group,
-            'description' => static::$description,
+            'label' => __(static::$label),
+            'group' => __(static::$group),
+            'description' => static::$description === null ? null : __(static::$description),
             'type' => static::type(),
         ];
     }
