@@ -1,20 +1,11 @@
-<div>
+<div
+    x-data
+    x-on:beforeunload.window="if ($wire.dirty) { $event.preventDefault(); $event.returnValue = '' }"
+>
     <x-flowkit::editor.layout>
         <x-slot:header>
             <x-flowkit::editor.header :flow="$flow">
-                <span
-                    x-data="{ shown: false }"
-                    x-on:flowkit-saved.window="shown = true; setTimeout(() => shown = false, 2000)"
-                    x-show="shown"
-                    x-cloak
-                    class="text-sm text-[var(--flowkit-muted)]"
-                >{{ __('flowkit::editor.saved') }}</span>
-                <a href="{{ route('flowkit.runs', $flow) }}" class="text-sm text-[var(--flowkit-muted)] hover:text-[var(--flowkit-text)]">{{ __('flowkit::runs.run_history') }}</a>
-                @if ($trigger)
-                    <x-flowkit::button wire:click="openTest">{{ __('flowkit::editor.test.button') }}</x-flowkit::button>
-                @endif
-                <x-flowkit::button wire:click="save">{{ __('flowkit::editor.save_draft') }}</x-flowkit::button>
-                <x-flowkit::button variant="primary" wire:click="publish">{{ __('flowkit::editor.publish') }}</x-flowkit::button>
+                <x-flowkit::editor.toolbar :flow="$flow" :can-undo="$history !== []" :dirty="$dirty" :can-test="(bool) $trigger" />
             </x-flowkit::editor.header>
         </x-slot:header>
 
@@ -39,6 +30,7 @@
                     :step="['id' => 'trigger'] + $trigger"
                     :label="$labels[$trigger['brick']] ?? $trigger['brick']"
                     :summary="$summaries['trigger'] ?? null"
+                    :problem="$problems['trigger'] ?? null"
                     :selected="$selected === 'trigger'"
                     kind="trigger"
                 />
@@ -55,7 +47,7 @@
             @endif
 
             @if ($trigger)
-                <x-flowkit::step.list :steps="$steps" :labels="$labels" :summaries="$summaries" :selected="$selected" :bricks="$stepBricks" />
+                <x-flowkit::step.list :steps="$steps" :labels="$labels" :summaries="$summaries" :problems="$problems" :selected="$selected" :bricks="$stepBricks" />
             @endif
         </div>
 
