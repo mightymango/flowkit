@@ -57,11 +57,13 @@ it('rejects trigger data that is not a JSON object', function (string $json) {
 })->with(['not json', '[1, 2]', '"text"']);
 
 it('reports an invalid draft instead of testing it', function () {
-    $flow = Flow::create(['key' => 'empty', 'name' => 'Empty']);
+    $flow = Flow::create(['key' => 'broken', 'name' => 'Broken']);
+    $flow->draft()->update(['definition' => [
+        'trigger' => ['brick' => 'core.manual', 'settings' => []],
+        'steps' => [['id' => 's1', 'brick' => 'no.such-brick', 'settings' => []]],
+    ]]);
 
     Livewire::test(FlowEditor::class, ['flow' => $flow])
-        ->call('setTrigger', 'core.manual')
-        ->set('steps', [['id' => 's1', 'brick' => 'no.such-brick', 'settings' => []]])
         ->call('openTest')
         ->call('runTest')
         ->assertNotSet('errorsList', []);

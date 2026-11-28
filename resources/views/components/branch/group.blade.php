@@ -3,6 +3,7 @@
     'step',
     'labels' => [],
     'summaries' => [],
+    'problems' => [],
     'selected' => null,
     'bricks' => [],
 ])
@@ -12,6 +13,7 @@
         :step="$step"
         :label="$labels[$step['brick']] ?? $step['brick']"
         :summary="$summaries[$step['id']] ?? null"
+        :problem="$problems[$step['id']] ?? null"
         :selected="$selected === $step['id']"
         kind="branch"
     />
@@ -24,6 +26,7 @@
                 :steps="$children"
                 :labels="$labels"
                 :summaries="$summaries"
+                :problems="$problems"
                 :selected="$selected"
                 :bricks="$bricks"
             />

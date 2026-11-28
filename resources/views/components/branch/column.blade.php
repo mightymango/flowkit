@@ -4,6 +4,7 @@
     'steps' => [],
     'labels' => [],
     'summaries' => [],
+    'problems' => [],
     'selected' => null,
     'bricks' => [],
 ])
@@ -18,6 +19,7 @@
         :steps="$steps"
         :labels="$labels"
         :summaries="$summaries"
+        :problems="$problems"
         :selected="$selected"
         :bricks="$bricks"
         :parent-id="$stepId"

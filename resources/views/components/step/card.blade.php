@@ -2,6 +2,7 @@
     'step',
     'label',
     'summary' => null,
+    'problem' => null,
     'selected' => false,
     'kind' => 'action',
 ])
@@ -10,7 +11,8 @@
     {{ $attributes->class([
         'group relative w-[var(--flowkit-card-width)] rounded-[var(--flowkit-radius)] border bg-[var(--flowkit-surface)] p-4 text-left text-[var(--flowkit-text)] shadow-sm transition',
         'border-[var(--flowkit-accent)] ring-2 ring-[var(--flowkit-accent)]/20' => $selected,
-        'border-[var(--flowkit-border)] hover:border-[var(--flowkit-accent)]/50' => ! $selected,
+        'border-[var(--flowkit-danger)]' => $problem && ! $selected,
+        'border-[var(--flowkit-border)] hover:border-[var(--flowkit-accent)]/50' => ! $selected && ! $problem,
     ]) }}
 >
     <button type="button" wire:click="select('{{ $step['id'] }}')" class="block w-full text-left">
@@ -21,6 +23,13 @@
         @php($summary ??= collect($step['settings'] ?? [])->filter(fn ($v) => is_scalar($v))->implode(' · '))
         @if ($summary !== '')
             <span class="mt-1 block truncate text-sm text-[var(--flowkit-muted)]">{{ $summary }}</span>
+        @endif
+
+        @if ($problem)
+            <span class="mt-2 flex items-start gap-1 text-xs text-[var(--flowkit-danger)]">
+                <span aria-hidden="true">⚠</span>
+                <span><span class="sr-only">{{ __('flowkit::editor.needs_attention') }}: </span>{{ $problem }}</span>
+            </span>
         @endif
     </button>
 

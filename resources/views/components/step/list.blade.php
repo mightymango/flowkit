@@ -3,6 +3,7 @@
     'steps' => [],
     'labels' => [],
     'summaries' => [],
+    'problems' => [],
     'selected' => null,
     'bricks' => [],
     'parentId' => null,
@@ -18,6 +19,7 @@
                 :step="$step"
                 :labels="$labels"
                 :summaries="$summaries"
+                :problems="$problems"
                 :selected="$selected"
                 :bricks="$bricks"
                 wire:key="step-{{ $step['id'] }}"
@@ -27,6 +29,7 @@
                 :step="$step"
                 :label="$labels[$step['brick']] ?? $step['brick']"
                 :summary="$summaries[$step['id']] ?? null"
+                :problem="$problems[$step['id']] ?? null"
                 :selected="$selected === $step['id']"
                 wire:key="step-{{ $step['id'] }}"
             />
