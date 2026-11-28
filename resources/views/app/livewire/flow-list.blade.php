@@ -17,14 +17,13 @@
     @else
         <ul class="divide-y divide-[var(--flowkit-border)] rounded-[var(--flowkit-radius)] border border-[var(--flowkit-border)] bg-[var(--flowkit-surface)]">
             @foreach ($flows as $flow)
-                <li wire:key="flow-{{ $flow->id }}">
-                    <a href="{{ route('flowkit.edit', $flow) }}" class="flex items-center justify-between px-4 py-3 hover:bg-[var(--flowkit-canvas)]">
-                        <span>
-                            <span class="font-medium">{{ $flow->name }}</span>
-                            <span class="ml-2 text-xs text-[var(--flowkit-muted)]">{{ trans_choice('flowkit::editor.versions', $flow->versions_count) }}</span>
-                        </span>
-                        <x-flowkit::status-pill :status="$flow->status" />
+                <li wire:key="flow-{{ $flow->id }}" class="flex items-center gap-3 px-4 py-3 hover:bg-[var(--flowkit-canvas)]">
+                    <a href="{{ route('flowkit.edit', $flow) }}" class="min-w-0 flex-1">
+                        <span class="font-medium">{{ $flow->name }}</span>
+                        <span class="ml-2 text-xs text-[var(--flowkit-muted)]">{{ trans_choice('flowkit::editor.versions', $flow->versions_count) }}</span>
                     </a>
+                    <a href="{{ route('flowkit.runs', $flow) }}" class="text-xs text-[var(--flowkit-muted)] hover:text-[var(--flowkit-text)]">{{ __('flowkit::runs.runs') }}<span class="sr-only">: {{ $flow->name }}</span></a>
+                    <x-flowkit::status-pill :status="$flow->status" />
                 </li>
             @endforeach
         </ul>

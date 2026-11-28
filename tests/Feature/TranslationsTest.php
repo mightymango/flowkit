@@ -54,7 +54,7 @@ it('has the same keys in English and Welsh', function (string $file) {
     $welsh = Arr::dot(require FlowkitServiceProvider::LANG_PATH."/cy/{$file}.php");
 
     expect(array_keys($welsh))->toEqualCanonicalizing(array_keys($english));
-})->with(['editor', 'errors', 'status']);
+})->with(['editor', 'errors', 'runs', 'status']);
 
 it('translates every core brick into Welsh', function () {
     $welsh = json_decode(file_get_contents(FlowkitServiceProvider::LANG_PATH.'/cy.json'), true);
