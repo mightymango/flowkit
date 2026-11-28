@@ -8,7 +8,8 @@
     'variables' => [],
 ])
 
-<div {{ $attributes->class('flex flex-wrap gap-1') }} role="group" aria-label="{{ __('flowkit::editor.insert_variable') }}">
+<div {{ $attributes->class('flex flex-wrap items-center gap-1') }} role="group" aria-labelledby="{{ $for }}-chips-label">
+    <span id="{{ $for }}-chips-label" class="text-xs text-[var(--flowkit-muted)]">{{ __('flowkit::editor.insert_variable') }}:</span>
     @foreach ($variables as $variable)
         <button
             type="button"

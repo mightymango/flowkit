@@ -193,9 +193,14 @@ class FlowEditor extends Component
             });
     }
 
+    /** Select a step and move keyboard focus to its settings. */
     public function select(?string $id): void
     {
         $this->selected = $id;
+
+        if ($id !== null) {
+            $this->dispatch('flowkit-focus-settings');
+        }
     }
 
     /**
@@ -366,7 +371,8 @@ class FlowEditor extends Component
         $node = $this->selected === 'trigger' ? $this->trigger : $this->findStep($this->selected);
 
         return view('flowkit::livewire.flow-editor', [
-            'flow' => Flow::findOrFail($this->flowId),
+            'flow' => $flow = Flow::findOrFail($this->flowId),
+            'version' => $flow->latestVersion()->value('version'),
             'triggers' => $registry->grouped('trigger'),
             'stepBricks' => array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition')),
             'labels' => $this->labels(),

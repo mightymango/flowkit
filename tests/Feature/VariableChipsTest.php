@@ -64,7 +64,7 @@ it('shows chips on fields that take variables, inserting placeholders', function
     $first = $editor->get('steps')[0]['id'];
 
     settingsPanel($editor)
-        ->assertSeeHtml('aria-label="Insert a variable"')
+        ->assertSee('Insert a variable:')
         ->assertSeeHtml('Set a variable: Value')
         ->assertSeeHtml("let text = '{{ steps.{$first}.value }}';")
         ->assertDontSeeHtml('echo e(')
@@ -76,11 +76,11 @@ it('shows no chips on fields that pick a value', function () {
         'stepId' => 's1',
         'brick' => 'core.set-variable',
         'variables' => [['path' => 'schedule.timezone', 'label' => 'Time zone', 'type' => null]],
-    ])->assertSeeHtml('aria-label="Insert a variable"');
+    ])->assertSee('Insert a variable:');
 
     Livewire::test(StepSettings::class, [
         'stepId' => 's1',
         'brick' => 'test.assign',
         'variables' => [['path' => 'employee.id', 'label' => 'Employee', 'type' => 'employee']],
-    ])->assertDontSeeHtml('aria-label="Insert a variable"');
+    ])->assertDontSee('Insert a variable:');
 });

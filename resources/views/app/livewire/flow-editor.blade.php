@@ -1,10 +1,11 @@
 <div
     x-data
     x-on:beforeunload.window="if ($wire.dirty) { $event.preventDefault(); $event.returnValue = '' }"
+    x-on:flowkit-focus-settings.window="$nextTick(() => { let panel = document.querySelector('[data-flowkit-settings]'); if (panel) { (panel.querySelector('input, select, textarea') ?? panel.querySelector('h2'))?.focus() } })"
 >
     <x-flowkit::editor.layout>
         <x-slot:header>
-            <x-flowkit::editor.header :flow="$flow">
+            <x-flowkit::editor.header :flow="$flow" :version="$version">
                 <x-flowkit::editor.toolbar :flow="$flow" :can-undo="$history !== []" :dirty="$dirty" :can-test="(bool) $trigger" />
             </x-flowkit::editor.header>
         </x-slot:header>
@@ -60,6 +61,24 @@
                     :variables="$selectedVariables"
                     :key="'settings-'.$selected.'-'.md5(json_encode([$selectedNode['settings'] ?? [], $selectedVariables]))"
                 />
+
+                <div class="mt-4 space-y-3">
+                    <p role="status" @class([
+                        'rounded-md px-3 py-2 text-sm',
+                        'bg-[var(--flowkit-canvas)] text-[var(--flowkit-success)]' => ! isset($problems[$selected]),
+                        'bg-[var(--flowkit-canvas)] text-[var(--flowkit-danger)]' => isset($problems[$selected]),
+                    ])>
+                        @if (isset($problems[$selected]))
+                            <span aria-hidden="true">⚠</span> {{ $problems[$selected] }}
+                        @else
+                            <span aria-hidden="true">✓</span> {{ __('flowkit::editor.step_valid') }}
+                        @endif
+                    </p>
+
+                    @if ($selected !== 'trigger')
+                        <x-flowkit::button wire:click="removeStep('{{ $selected }}')" wire:confirm="{{ __('flowkit::editor.confirm_delete') }}" class="w-full"><span class="text-[var(--flowkit-danger)]">{{ __('flowkit::editor.delete_step') }}</span></x-flowkit::button>
+                    @endif
+                </div>
 
                 @if ($destinations)
                     <div class="mt-6 space-y-1 border-t border-[var(--flowkit-border)] pt-4">
