@@ -51,30 +51,30 @@ class FlowList extends Component
 
     public function pause(int $id): void
     {
-        Flow::findOrFail($id)->update(['paused' => true]);
+        Flow::inEditor()->findOrFail($id)->update(['paused' => true]);
     }
 
     public function resume(int $id): void
     {
-        Flow::findOrFail($id)->update(['paused' => false]);
+        Flow::inEditor()->findOrFail($id)->update(['paused' => false]);
     }
 
     /** Archived flows don't run and are hidden from the list unless filtered for. */
     public function archive(int $id): void
     {
-        Flow::findOrFail($id)->update(['status' => FlowStatus::Archived]);
+        Flow::inEditor()->findOrFail($id)->update(['status' => FlowStatus::Archived]);
     }
 
     public function restore(int $id): void
     {
-        $flow = Flow::findOrFail($id);
+        $flow = Flow::inEditor()->findOrFail($id);
         $flow->update(['status' => $flow->live_version_id ? FlowStatus::Live : FlowStatus::Draft]);
     }
 
     /** Copy a flow's latest version into a new flow's draft, owned by you. */
     public function duplicate(int $id)
     {
-        $source = Flow::findOrFail($id);
+        $source = Flow::inEditor()->findOrFail($id);
         $name = __('flowkit::editor.list.copy_of', ['name' => $source->name]);
 
         $copy = Flow::create([
@@ -95,7 +95,7 @@ class FlowList extends Component
 
     public function edit(int $id): void
     {
-        $flow = Flow::findOrFail($id);
+        $flow = Flow::inEditor()->findOrFail($id);
 
         $this->editingId = $flow->id;
         $this->editName = $flow->name;
@@ -113,7 +113,7 @@ class FlowList extends Component
             'editDescription' => __('flowkit::editor.list.description'),
         ]);
 
-        Flow::findOrFail($this->editingId)->update([
+        Flow::inEditor()->findOrFail($this->editingId)->update([
             'name' => $this->editName,
             'description' => $this->editDescription === '' ? null : $this->editDescription,
         ]);
@@ -129,7 +129,7 @@ class FlowList extends Component
 
     public function render()
     {
-        $flows = Flow::query()
+        $flows = Flow::inEditor()
             ->with('owner')
             ->withCount('versions')
             ->addSelect(['last_run_id' => FlowRun::query()

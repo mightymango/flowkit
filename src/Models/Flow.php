@@ -2,6 +2,8 @@
 
 namespace MightyMango\Flowkit\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -120,6 +122,17 @@ class Flow extends Model
         ])->save();
 
         return $version;
+    }
+
+    /**
+     * Flows the editor shows: all but `flowkit.editor.hidden_flows`.
+     *
+     * @param  Builder<Flow>  $query
+     */
+    #[Scope]
+    protected function inEditor(Builder $query): void
+    {
+        $query->whereNotIn('key', (array) config('flowkit.editor.hidden_flows', []));
     }
 
     /** The owner's name (or email) for display, if the flow has an owner. */
