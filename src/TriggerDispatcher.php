@@ -3,6 +3,7 @@
 namespace MightyMango\Flowkit;
 
 use DateTimeInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -11,6 +12,7 @@ use LogicException;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\ModelEvent;
 use MightyMango\Flowkit\Bricks\Core\Schedule;
+use MightyMango\Flowkit\Engine\TriggerKey;
 use MightyMango\Flowkit\Enums\FlowStatus;
 use MightyMango\Flowkit\Models\Flow;
 
@@ -37,8 +39,11 @@ class TriggerDispatcher
         }
 
         $rules = app(ModelEvent::class)->rules();
+        $key = TriggerKey::modelEvent($model::class, $event);
 
-        $this->fire(ModelEvent::$key, $payload, function (array $settings) use ($model, $event, $changes, $rules) {
+        // Only load flows indexed for this model and event; the full settings
+        // check below still decides whether each one matches.
+        $this->dispatch(ModelEvent::$key, fn (Builder $query) => $query->where('trigger_key', $key), $payload, function (array $settings) use ($model, $event, $changes, $rules) {
             // Never trust a stored definition: a trigger with invalid settings matches nothing.
             if (Validator::make($settings, $rules)->fails()) {
                 return false;
@@ -112,10 +117,26 @@ class TriggerDispatcher
     }
 
     /**
+     * Start every live flow whose trigger is `$triggerKey` and matches.
+     *
      * @param  callable(array $settings, Flow $flow): bool|null  $matches
      * @param  callable(array $settings): array|null  $payloadFor  extra payload per flow, merged over $payload
      */
     public function fire(string $triggerKey, array $payload, ?callable $matches = null, ?callable $payloadFor = null): int
+    {
+        // A trigger keyed by more than its brick (see TriggerKey) is stored as
+        // `<brick>:...`. The brick check in dispatch() makes the match exact.
+        return $this->dispatch($triggerKey, fn (Builder $query) => $query->where(fn (Builder $query) => $query
+            ->where('trigger_key', $triggerKey)
+            ->orWhere('trigger_key', 'like', $triggerKey.':%')), $payload, $matches, $payloadFor);
+    }
+
+    /**
+     * @param  callable(Builder<Flow>): mixed  $narrow  limits the query by `trigger_key`
+     * @param  callable(array $settings, Flow $flow): bool|null  $matches
+     * @param  callable(array $settings): array|null  $payloadFor
+     */
+    private function dispatch(string $brick, callable $narrow, array $payload, ?callable $matches = null, ?callable $payloadFor = null): int
     {
         if (! config('flowkit.enabled', true)) {
             return 0;
@@ -126,11 +147,12 @@ class TriggerDispatcher
         Flow::query()
             ->where('status', FlowStatus::Live)
             ->where('paused', false)
+            ->tap($narrow)
             ->with('liveVersion')
-            ->each(function (Flow $flow) use ($triggerKey, $payload, $matches, $payloadFor, &$started) {
+            ->each(function (Flow $flow) use ($brick, $payload, $matches, $payloadFor, &$started) {
                 $trigger = $flow->liveVersion?->definition['trigger'] ?? null;
 
-                if (($trigger['brick'] ?? null) !== $triggerKey) {
+                if (($trigger['brick'] ?? null) !== $brick) {
                     return;
                 }
 

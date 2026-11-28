@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use MightyMango\Flowkit\Engine\Definition;
+use MightyMango\Flowkit\Engine\TriggerKey;
 use MightyMango\Flowkit\Enums\FlowStatus;
 
 /**
@@ -20,6 +21,7 @@ use MightyMango\Flowkit\Enums\FlowStatus;
  * @property int|null $live_version_id
  * @property bool $paused
  * @property string|null $last_scheduled_at
+ * @property string|null $trigger_key
  * @property-read FlowVersion|null $liveVersion
  * @property-read FlowVersion|null $latestVersion
  */
@@ -31,6 +33,18 @@ class Flow extends Model
         'status' => FlowStatus::class,
         'paused' => 'boolean',
     ];
+
+    protected static function booted(): void
+    {
+        // Keep the trigger index in step with the live version. publish()
+        // sets the key itself; any other change of status or live version
+        // (unpublishing, archiving, going live again) recomputes it here.
+        static::saving(function (Flow $flow) {
+            if ($flow->isDirty(['status', 'live_version_id']) && ! $flow->isDirty('trigger_key')) {
+                $flow->trigger_key = $flow->currentTriggerKey();
+            }
+        });
+    }
 
     /** @return MorphTo<Model, $this> */
     public function owner(): MorphTo
@@ -102,6 +116,7 @@ class Flow extends Model
         $this->forceFill([
             'live_version_id' => $version->id,
             'status' => FlowStatus::Live,
+            'trigger_key' => TriggerKey::fromDefinition($version->definition),
         ])->save();
 
         return $version;
@@ -113,6 +128,21 @@ class Flow extends Model
         $owner = $this->owner;
 
         return $owner ? (data_get($owner, 'name') ?? data_get($owner, 'email')) : null;
+    }
+
+    /**
+     * The key the dispatcher looks this flow up by: derived from the live
+     * version's trigger while the flow is live, otherwise null.
+     */
+    private function currentTriggerKey(): ?string
+    {
+        if ($this->status !== FlowStatus::Live || $this->live_version_id === null) {
+            return null;
+        }
+
+        $version = FlowVersion::query()->find($this->live_version_id);
+
+        return $version ? TriggerKey::fromDefinition($version->definition) : null;
     }
 
     public function isRunnable(): bool

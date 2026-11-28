@@ -134,6 +134,8 @@ Enum casts are reduced to their value and dates to ISO 8601 strings. To start a 
 
 An empty `from` or `to` matches any value; values are compared as strings. A trigger whose settings fail validation never matches.
 
+Publishing a flow stores what its trigger listens for in `flows.trigger_key`, e.g. `core.model-event:App\Models\Employee:changed`, so a model save only loads the live flows for that model and event, however many other flows there are. The key is kept up to date when a flow is published, archived or unpublished through the `Flow` model; a bulk query update that changes `status` or `live_version_id` skips it.
+
 ### Scheduled flows
 
 The `core.schedule` trigger starts a flow on a cron expression, such as `0 9 * * 1` for 9am every Monday, with an optional time zone (the app's by default). The run gets `schedule.scheduled_at` and `schedule.timezone`.
