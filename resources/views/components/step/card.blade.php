@@ -1,6 +1,7 @@
 @props([
     'step',
     'label',
+    'summary' => null,
     'selected' => false,
     'kind' => 'action',
 ])
@@ -16,10 +17,10 @@
         <x-flowkit::step.badge :kind="$kind" />
         <span class="mt-1 block font-medium">{{ $label }}</span>
 
-        @if (! empty($step['settings']))
-            <span class="mt-1 block truncate text-sm text-[var(--flowkit-muted)]">
-                {{ collect($step['settings'])->filter(fn ($v) => is_scalar($v))->implode(' · ') }}
-            </span>
+        {{-- The brick's readable summary; without one, the raw values. --}}
+        @php($summary ??= collect($step['settings'] ?? [])->filter(fn ($v) => is_scalar($v))->implode(' · '))
+        @if ($summary !== '')
+            <span class="mt-1 block truncate text-sm text-[var(--flowkit-muted)]">{{ $summary }}</span>
         @endif
     </button>
 
