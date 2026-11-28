@@ -122,6 +122,14 @@ class Flow extends Model
         return $version;
     }
 
+    /** The owner's name (or email) for display, if the flow has an owner. */
+    public function ownerName(): ?string
+    {
+        $owner = $this->owner;
+
+        return $owner ? (data_get($owner, 'name') ?? data_get($owner, 'email')) : null;
+    }
+
     /**
      * The key the dispatcher looks this flow up by: derived from the live
      * version's trigger while the flow is live, otherwise null.
