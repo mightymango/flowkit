@@ -133,7 +133,10 @@ return [
     |--------------------------------------------------------------------------
     |
     | Customisation level 4: bind your own class in place of a package
-    | component, e.g. 'flow-editor' => App\Flows\FlowEditor::class.
+    | component, e.g. 'flow-editor' => App\Flows\FlowEditor::class. Swappable:
+    | flow-list, flow-editor and step-settings. A replacement settings panel
+    | sends valid settings with StepSettings::APPLIED; the editor validates
+    | them again before storing them.
     |
     */
 

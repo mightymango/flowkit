@@ -252,7 +252,7 @@ The events carry IDs and status only, never the payload, input or output, becaus
 | 1. Tokens | Override `--flowkit-accent`, `--flowkit-radius`, `--flowkit-surface`… | None |
 | 2. Attributes | `<x-flowkit::step.card class="shadow-none" />` | None |
 | 3. Publish | `php artisan flowkit:publish step.card` → `resources/views/flowkit/step/card.blade.php` | You own that file |
-| 4. Swap Livewire | `'components' => ['flow-editor' => App\Flows\FlowEditor::class]` | You own the logic |
+| 4. Swap Livewire | `'components' => ['flow-editor' => App\Flows\FlowEditor::class]`; also `flow-list` and `step-settings` | You own the logic |
 
 `flowkit:publish` takes component names, `--all`, `--force`, or none for an interactive picker. Each published file starts with the package version it came from.
 

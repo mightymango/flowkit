@@ -2,21 +2,23 @@
 
 namespace MightyMango\Flowkit\Livewire;
 
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Component;
-use MightyMango\Flowkit\Bricks\Brick;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\Branch;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Exceptions\InvalidDefinition;
+use MightyMango\Flowkit\Fields\SettingsForm;
 use MightyMango\Flowkit\Models\Flow;
 
 /**
- * Loads a flow's draft version, holds the step tree, and adds, moves,
- * deletes and configures steps. Logic lives here; markup lives in the
- * publishable flowkit:: Blade components.
+ * Loads a flow's draft version, holds the step tree, and adds, moves and
+ * deletes steps. The selected step's settings are edited in the
+ * `flowkit.step-settings` component, which sends valid settings back with
+ * the `flowkit-step-settings-applied` event. Logic lives here; markup lives
+ * in the publishable flowkit:: Blade components.
  */
 class FlowEditor extends Component
 {
@@ -28,8 +30,6 @@ class FlowEditor extends Component
     public array $steps = [];
 
     public ?string $selected = null;
-
-    public array $settings = [];
 
     public array $errorsList = [];
 
@@ -85,7 +85,6 @@ class FlowEditor extends Component
 
         if ($this->selected === $id) {
             $this->selected = null;
-            $this->settings = [];
         }
     }
 
@@ -114,58 +113,43 @@ class FlowEditor extends Component
     public function select(?string $id): void
     {
         $this->selected = $id;
-        $this->resetValidation();
-
-        $node = $id === 'trigger' ? $this->trigger : $this->findStep($id);
-        $this->settings = $node['settings'] ?? [];
     }
 
     /**
-     * Validate the selected step's settings server-side against its brick's
-     * fields, then store them in the tree.
+     * Store settings from the step settings panel. Event parameters come
+     * from the browser, so they're validated again here against the brick
+     * of the step in this editor's own tree, never the brick the event names.
      */
-    public function applySettings(): void
+    #[On(StepSettings::APPLIED)]
+    public function storeSettings(string $stepId, array $settings): void
     {
-        $node = $this->selected === 'trigger' ? $this->trigger : $this->findStep($this->selected);
+        $node = $stepId === 'trigger' ? $this->trigger : $this->findStep($stepId);
 
         if (! $node) {
             return;
         }
 
-        // Validate the settings on their own, exactly as the runner does, so
-        // rules that refer to other settings (e.g. required_without) resolve.
-        $this->resetValidation();
-        $brick = app(BrickRegistry::class)->resolve($node['brick']);
-        $validator = Validator::make(
-            $this->settings,
-            $brick->rulesFor($this->settings),
-            attributes: array_column($this->fieldsFor($brick), 'label', 'name'),
-        );
+        $validator = SettingsForm::for(app(BrickRegistry::class)->resolve($node['brick']))->validator($settings);
 
         if ($validator->fails()) {
-            foreach ($validator->errors()->messages() as $key => $messages) {
-                foreach ($messages as $message) {
-                    $this->addError("settings.{$key}", $message);
-                }
-            }
-
             return;
         }
 
         $validated = $validator->validated();
 
-        if ($this->selected === 'trigger') {
+        if ($stepId === 'trigger') {
             $this->trigger['settings'] = $validated;
-        } else {
-            $id = $this->selected;
-            $this->steps = $this->mapTree($this->steps, function (array $step) use ($id, $validated) {
-                if ($step['id'] === $id) {
-                    $step['settings'] = $validated;
-                }
 
-                return $step;
-            });
+            return;
         }
+
+        $this->steps = $this->mapTree($this->steps, function (array $step) use ($stepId, $validated) {
+            if ($step['id'] === $stepId) {
+                $step['settings'] = $validated;
+            }
+
+            return $step;
+        });
     }
 
     public function save(): void
@@ -201,34 +185,14 @@ class FlowEditor extends Component
     {
         $registry = app(BrickRegistry::class);
         $node = $this->selected === 'trigger' ? $this->trigger : $this->findStep($this->selected);
-        $brick = $node && $registry->has($node['brick']) ? $registry->resolve($node['brick']) : null;
 
         return view('flowkit::livewire.flow-editor', [
             'flow' => Flow::findOrFail($this->flowId),
             'triggers' => $registry->grouped('trigger'),
             'stepBricks' => array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition')),
             'labels' => array_map(fn ($class) => __($class::$label), $registry->all()),
-            'selectedBrick' => $brick,
-            'fields' => $brick ? $this->fieldsFor($brick) : [],
+            'selectedNode' => $node && $registry->has($node['brick']) ? $node : null,
         ]);
-    }
-
-    /**
-     * The selected brick's fields for the settings panel. A branch that uses
-     * a Condition brick also shows that condition's fields, stored under
-     * `condition_settings`.
-     */
-    private function fieldsFor(Brick $brick): array
-    {
-        $fields = array_map(fn ($field) => $field->toArray(), $brick->fields());
-
-        if ($brick instanceof Branch) {
-            foreach ($brick->conditionFields($this->settings) as $field) {
-                $fields[] = ['name' => "condition_settings.{$field->name}"] + $field->toArray();
-            }
-        }
-
-        return $fields;
     }
 
     private function assertBrick(string $key, ?string $type = null): void

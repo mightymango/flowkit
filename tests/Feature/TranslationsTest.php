@@ -70,9 +70,9 @@ it('renders the editor in Welsh', function () {
         ->call('addStep', 'core.branch')
         ->assertSee(['Os / fel arall', 'Ie', 'Fel arall', 'Gwiriad', 'Mynegiad', 'Cymhwyso']);
 
-    $editor->call('applySettings')->assertHasErrors('settings.when');
+    $panel = settingsPanel($editor)->call('apply')->assertHasErrors('settings.when');
 
-    expect($editor->errors()->first('settings.when'))->toContain('Mynegiad');
+    expect($panel->errors()->first('settings.when'))->toContain('Mynegiad');
 });
 
 it('shows the variable placeholder literally in the translated hint', function () {

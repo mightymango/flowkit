@@ -50,26 +50,14 @@
             @endif
         </div>
 
-        @if ($selectedBrick)
+        @if ($selectedNode)
             <x-slot:panel>
-                <form wire:submit="applySettings" class="space-y-4" aria-label="{{ __('flowkit::editor.step_settings') }}">
-                    <div>
-                        <h2 class="font-semibold">{{ __($selectedBrick::$label) }}</h2>
-                        @if ($selectedBrick::$description)
-                            <p class="mt-1 text-sm text-[var(--flowkit-muted)]">{{ __($selectedBrick::$description) }}</p>
-                        @endif
-                    </div>
-
-                    @forelse ($fields as $field)
-                        <x-dynamic-component :component="$field['component']" :field="$field" wire:key="field-{{ $selected }}-{{ $field['name'] }}" />
-                    @empty
-                        <p class="text-sm text-[var(--flowkit-muted)]">{{ __('flowkit::editor.no_settings') }}</p>
-                    @endforelse
-
-                    @if ($fields)
-                        <x-flowkit::button type="submit" variant="primary">{{ __('flowkit::editor.apply') }}</x-flowkit::button>
-                    @endif
-                </form>
+                <livewire:flowkit.step-settings
+                    :step-id="$selected"
+                    :brick="$selectedNode['brick']"
+                    :settings="$selectedNode['settings'] ?? []"
+                    :key="'settings-'.$selected.'-'.md5(json_encode($selectedNode['settings'] ?? []))"
+                />
             </x-slot:panel>
         @endif
     </x-flowkit::editor.layout>

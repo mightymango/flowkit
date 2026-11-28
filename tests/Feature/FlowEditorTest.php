@@ -1,8 +1,10 @@
 <?php
 
 use Livewire\Livewire;
+use MightyMango\Flowkit\FlowkitServiceProvider;
 use MightyMango\Flowkit\Livewire\FlowEditor;
 use MightyMango\Flowkit\Livewire\FlowList;
+use MightyMango\Flowkit\Livewire\StepSettings;
 use MightyMango\Flowkit\Models\Flow;
 
 it('lists flows', function () {
@@ -22,13 +24,12 @@ it('builds, configures and publishes a flow', function () {
 
     $branchId = $editor->get('steps')[0]['id'];
 
+    applySettings($editor, ['when' => "employee.department == 'Delivery'"])->assertHasNoErrors();
+
+    $editor->call('addStep', 'core.set-variable', $branchId, 'yes');
+    applySettings($editor, ['name' => 'greeting', 'value' => 'Welcome {{ employee.name }}'])->assertHasNoErrors();
+
     $editor
-        ->set('settings.when', "employee.department == 'Delivery'")
-        ->call('applySettings')
-        ->assertHasNoErrors()
-        ->call('addStep', 'core.set-variable', $branchId, 'yes')
-        ->set('settings.value', 'Welcome {{ employee.name }}')
-        ->call('applySettings')
         ->assertSee('Set a variable')
         ->call('publish')
         ->assertSet('errorsList', []);
@@ -43,12 +44,45 @@ it('builds, configures and publishes a flow', function () {
 it('validates step settings server-side', function () {
     $flow = Flow::create(['key' => 'onboarding', 'name' => 'Onboarding']);
 
+    $editor = Livewire::test(FlowEditor::class, ['flow' => $flow])
+        ->call('setTrigger', 'core.manual')
+        ->call('addStep', 'core.wait');
+
+    applySettings($editor, ['duration' => 'next week'])
+        ->assertHasErrors('settings.duration')
+        ->assertNotDispatched(StepSettings::APPLIED);
+
+    expect($editor->get('steps')[0]['settings'])->toBe([]);
+});
+
+it('validates settings again when the editor stores them', function () {
+    $flow = Flow::create(['key' => 'onboarding', 'name' => 'Onboarding']);
+
+    $editor = Livewire::test(FlowEditor::class, ['flow' => $flow])
+        ->call('setTrigger', 'core.manual')
+        ->call('addStep', 'core.wait');
+    $id = $editor->get('steps')[0]['id'];
+
+    // A forged event from the browser, skipping the panel's validation.
+    $editor->dispatch(StepSettings::APPLIED, stepId: $id, settings: ['duration' => 'next week']);
+    expect($editor->get('steps')[0]['settings'])->toBe([]);
+
+    $editor->dispatch(StepSettings::APPLIED, stepId: $id, settings: ['duration' => 'P1D', 'extra' => 'dropped']);
+    expect($editor->get('steps')[0]['settings'])->toBe(['duration' => 'P1D']);
+});
+
+it('renders the settings panel for the selected step', function () {
+    $flow = Flow::create(['key' => 'onboarding', 'name' => 'Onboarding']);
+
     Livewire::test(FlowEditor::class, ['flow' => $flow])
         ->call('setTrigger', 'core.manual')
         ->call('addStep', 'core.wait')
-        ->set('settings.duration', 'next week')
-        ->call('applySettings')
-        ->assertHasErrors('settings.duration');
+        ->assertSeeLivewire(StepSettings::class);
+});
+
+it('lets an app swap the settings panel', function () {
+    expect(config('flowkit.components'))->toBeArray()
+        ->and(FlowkitServiceProvider::COMPONENTS['step-settings'])->toBe(StepSettings::class);
 });
 
 it('removes steps', function () {

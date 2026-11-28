@@ -100,7 +100,7 @@ The editor is a few Livewire components that compose anonymous Blade components.
 | Component | Responsibility |
 | --- | --- |
 | `flowkit.flow-editor` | Loads a draft version, holds the step tree, add/move/delete steps, saves, validates |
-| `flowkit.step-settings` | Renders the selected step's fields from the brick's declaration, validates them |
+| `flowkit.step-settings` | Renders the selected step's fields from the brick's declaration, validates them, and sends valid settings to the editor with the `flowkit-step-settings-applied` event; the editor validates them again before storing them (#18) |
 | `flowkit.flow-list` | Index of flows with status, owner and last run |
 | `flowkit.run-history` | Runs per flow, with per-step input, output and errors |
 | `flowkit.approval` | Diff between versions, approve or reject with a comment |
