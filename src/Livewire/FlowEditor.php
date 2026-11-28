@@ -28,9 +28,25 @@ class FlowEditor extends Component
     #[Locked]
     public int $flowId;
 
+    /**
+     * The tree being edited. Locked: it only changes through this
+     * component's actions, which validate what they store.
+     */
+    #[Locked]
     public ?array $trigger = null;
 
+    #[Locked]
     public array $steps = [];
+
+    /** Earlier trees for undo, newest last, at most HISTORY_LIMIT. */
+    #[Locked]
+    public array $history = [];
+
+    /** Whether there are changes since the draft was last saved. */
+    #[Locked]
+    public bool $dirty = false;
+
+    public const HISTORY_LIMIT = 20;
 
     public ?string $selected = null;
 
@@ -57,6 +73,7 @@ class FlowEditor extends Component
     public function setTrigger(string $brick): void
     {
         $this->assertBrick($brick, 'trigger');
+        $this->remember();
         $this->trigger = ['brick' => $brick, 'settings' => []];
         $this->select('trigger');
     }
@@ -76,6 +93,8 @@ class FlowEditor extends Component
             $step['branches'] = array_fill_keys($instance->branches(), []);
         }
 
+        $this->remember();
+
         if ($parentId === null) {
             $this->steps[] = $step;
         } else {
@@ -93,6 +112,7 @@ class FlowEditor extends Component
 
     public function removeStep(string $id): void
     {
+        $this->remember();
         $this->steps = $this->filterTree($this->steps, fn (array $node) => $node['id'] !== $id);
 
         if ($this->selected === $id) {
@@ -119,6 +139,7 @@ class FlowEditor extends Component
             return $list;
         };
 
+        $this->remember();
         $this->steps = $move($this->steps);
     }
 
@@ -150,6 +171,7 @@ class FlowEditor extends Component
         }
 
         $validated = $validator->validated();
+        $this->remember();
 
         if ($stepId === 'trigger') {
             $this->trigger['settings'] = $validated;
@@ -174,6 +196,7 @@ class FlowEditor extends Component
         $flow->draft()->update(['definition' => $definition->toArray()]);
         $flow->touch();
 
+        $this->dirty = false;
         $this->errorsList = [];
         $this->dispatch('flowkit-saved');
     }
@@ -181,6 +204,18 @@ class FlowEditor extends Component
     public function publish(): void
     {
         $this->save();
+
+        if ($problems = $this->problems()) {
+            $labels = $this->labels();
+            $this->errorsList = [];
+
+            foreach ($problems as $id => $message) {
+                $node = $id === 'trigger' ? $this->trigger : $this->findStep($id);
+                $this->errorsList[] = ($labels[$node['brick']] ?? $node['brick']).': '.$message;
+            }
+
+            return;
+        }
 
         $flow = Flow::findOrFail($this->flowId);
 
@@ -252,6 +287,23 @@ class FlowEditor extends Component
         $this->testRunId = Flowkit::testVersion($draft, $payload)->id;
     }
 
+    /** Go back to the tree before the last change. */
+    public function undo(): void
+    {
+        $previous = array_pop($this->history);
+
+        if ($previous === null) {
+            return;
+        }
+
+        [$this->trigger, $this->steps] = $previous;
+        $this->dirty = true;
+
+        if ($this->selected && $this->selected !== 'trigger' && ! $this->findStep($this->selected)) {
+            $this->selected = null;
+        }
+    }
+
     public function closeTest(): void
     {
         $this->testing = false;
@@ -267,7 +319,8 @@ class FlowEditor extends Component
             'flow' => Flow::findOrFail($this->flowId),
             'triggers' => $registry->grouped('trigger'),
             'stepBricks' => array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition')),
-            'labels' => array_map(fn ($class) => __($class::$label), $registry->all()),
+            'labels' => $this->labels(),
+            'problems' => $this->problems(),
             'summaries' => $this->summaries(),
             'selectedNode' => $node && $registry->has($node['brick']) ? $node : null,
             'testRun' => $this->testRunId
@@ -310,6 +363,59 @@ class FlowEditor extends Component
         $collect($this->steps);
 
         return $summaries;
+    }
+
+    /** Record the tree before a change, for undo, and mark the editor dirty. */
+    private function remember(): void
+    {
+        $this->history[] = [$this->trigger, $this->steps];
+        $this->history = array_slice($this->history, -self::HISTORY_LIMIT);
+        $this->dirty = true;
+    }
+
+    /** @return array<string, string> brick key => label */
+    private function labels(): array
+    {
+        return array_map(fn ($class) => (string) __($class::$label), app(BrickRegistry::class)->all());
+    }
+
+    /**
+     * Steps whose settings are missing or invalid, with the first problem,
+     * keyed by step id (the trigger's under `trigger`). Shown on the cards
+     * as you edit, and checked again before publishing.
+     *
+     * @return array<string, string>
+     */
+    private function problems(): array
+    {
+        $registry = app(BrickRegistry::class);
+        $problems = [];
+
+        $check = function (array $nodes) use (&$check, &$problems, $registry): void {
+            foreach ($nodes as $key => $node) {
+                $id = $node['id'] ?? $key;
+
+                if (! $registry->has($node['brick'] ?? '')) {
+                    $problems[$id] = __('flowkit::errors.unknown_brick', ['where' => $id, 'brick' => $node['brick'] ?? '']);
+                } else {
+                    $validator = SettingsForm::for($registry->resolve($node['brick']), StepVariables::before($this->trigger, $this->steps, $id))
+                        ->validator($node['settings'] ?? []);
+
+                    if ($validator->fails()) {
+                        $problems[$id] = $validator->errors()->first();
+                    }
+                }
+
+                foreach ($node['branches'] ?? [] as $children) {
+                    $check($children);
+                }
+            }
+        };
+
+        $check($this->trigger ? ['trigger' => $this->trigger] : []);
+        $check($this->steps);
+
+        return $problems;
     }
 
     private function assertBrick(string $key, ?string $type = null): void
