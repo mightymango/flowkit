@@ -69,6 +69,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Migrations
+    |--------------------------------------------------------------------------
+    |
+    | Flowkit's migrations run with the app's own `php artisan migrate`. Set
+    | this to false if you run them yourself instead, e.g. in each tenant's
+    | database: point the tenant migrator at
+    | vendor/mightymango/flowkit/database/migrations.
+    |
+    */
+
+    'migrations' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Queue
     |--------------------------------------------------------------------------
     */

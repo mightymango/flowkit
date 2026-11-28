@@ -3,14 +3,20 @@
 namespace MightyMango\Flowkit\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Queue\ShouldQueueAfterCommit;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use MightyMango\Flowkit\Engine\Runner;
 use MightyMango\Flowkit\Models\FlowRun;
 
-class RunFlow implements ShouldQueue
+/**
+ * Queued only once any open database transaction commits. A trigger often
+ * fires inside one (e.g. a model saved in a transaction), and the run's own
+ * row is created there too, so a worker that picked the job up earlier
+ * might not find it, or might run a flow for a change that's rolled back.
+ */
+class RunFlow implements ShouldQueueAfterCommit
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

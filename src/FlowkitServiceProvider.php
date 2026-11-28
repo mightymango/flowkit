@@ -21,6 +21,9 @@ use MightyMango\Flowkit\Livewire\FlowList;
 
 class FlowkitServiceProvider extends ServiceProvider
 {
+    /** The package's migrations, for apps that run them from their own path. */
+    public const MIGRATIONS_PATH = __DIR__.'/../database/migrations';
+
     /** Bricks every app gets. */
     public const CORE_BRICKS = [
         Core\Manual::class,
@@ -52,8 +55,10 @@ class FlowkitServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // 1. Migrations.
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        // 1. Migrations, unless the app runs them itself (e.g. per tenant).
+        if (config('flowkit.migrations', true)) {
+            $this->loadMigrationsFrom(self::MIGRATIONS_PATH);
+        }
 
         $this->registerViews();
         $this->registerLivewireComponents();
@@ -69,7 +74,7 @@ class FlowkitServiceProvider extends ServiceProvider
             ], 'flowkit-config');
 
             $this->publishes([
-                __DIR__.'/../database/migrations' => database_path('migrations'),
+                self::MIGRATIONS_PATH => database_path('migrations'),
             ], 'flowkit-migrations');
 
             $this->publishes([
