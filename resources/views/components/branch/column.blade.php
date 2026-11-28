@@ -3,6 +3,7 @@
     'stepId',
     'steps' => [],
     'labels' => [],
+    'summaries' => [],
     'selected' => null,
     'bricks' => [],
 ])
@@ -16,6 +17,7 @@
     <x-flowkit::step.list
         :steps="$steps"
         :labels="$labels"
+        :summaries="$summaries"
         :selected="$selected"
         :bricks="$bricks"
         :parent-id="$stepId"

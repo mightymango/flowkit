@@ -138,6 +138,14 @@ abstract class Field implements Arrayable
         return [];
     }
 
+    /**
+     * How a stored value reads on a step card, or null to leave it out.
+     */
+    public function summarise(mixed $value): ?string
+    {
+        return is_scalar($value) && $value !== '' ? (string) $value : null;
+    }
+
     public function toArray(): array
     {
         return [

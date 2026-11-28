@@ -26,6 +26,25 @@ return [
     'required' => 'gofynnol',
     'variables_hint' => 'Defnyddiwch :placeholder i fewnosod data o gamau cynharach.',
     'duration_placeholder' => 'P7D (7 diwrnod), PT2H (2 awr)',
+    'duration_amount' => 'Faint',
+    'duration_unit' => 'Uned',
+    'duration_iso' => 'Hyd ISO 8601',
+    'duration_units' => [
+        'minutes' => 'Munudau',
+        'hours' => 'Oriau',
+        'days' => 'Diwrnodau',
+        'weeks' => 'Wythnosau',
+        'other' => 'Arall (ISO 8601)',
+    ],
+    'durations' => [
+        'years' => ':count flwyddyn|:count flynedd|:count blynedd|:count mlynedd',
+        'months' => ':count mis',
+        'weeks' => ':count wythnos',
+        'days' => ':count diwrnod',
+        'hours' => ':count awr',
+        'minutes' => ':count munud',
+        'seconds' => ':count eiliad',
+    ],
     'step_settings' => 'Gosodiadau cam',
 
     'badge' => [

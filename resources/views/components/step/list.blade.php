@@ -2,6 +2,7 @@
 @props([
     'steps' => [],
     'labels' => [],
+    'summaries' => [],
     'selected' => null,
     'bricks' => [],
     'parentId' => null,
@@ -16,6 +17,7 @@
             <x-flowkit::branch.group
                 :step="$step"
                 :labels="$labels"
+                :summaries="$summaries"
                 :selected="$selected"
                 :bricks="$bricks"
                 wire:key="step-{{ $step['id'] }}"
@@ -24,6 +26,7 @@
             <x-flowkit::step.card
                 :step="$step"
                 :label="$labels[$step['brick']] ?? $step['brick']"
+                :summary="$summaries[$step['id']] ?? null"
                 :selected="$selected === $step['id']"
                 wire:key="step-{{ $step['id'] }}"
             />

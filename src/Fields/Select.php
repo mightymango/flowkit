@@ -38,6 +38,14 @@ class Select extends Field
             : [];
     }
 
+    /** A fixed option reads as its label. */
+    public function summarise(mixed $value): ?string
+    {
+        $options = $this->variableType === null ? $this->getOptions() : [];
+
+        return is_scalar($value) && isset($options[$value]) ? (string) __($options[$value]) : parent::summarise($value);
+    }
+
     public function toArray(): array
     {
         return parent::toArray() + ['options' => array_map(fn ($label) => __($label), $this->getOptions())];

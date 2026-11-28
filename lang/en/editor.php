@@ -26,6 +26,25 @@ return [
     'required' => 'required',
     'variables_hint' => 'Use :placeholder to insert data from earlier steps.',
     'duration_placeholder' => 'P7D (7 days), PT2H (2 hours)',
+    'duration_amount' => 'How many',
+    'duration_unit' => 'Unit',
+    'duration_iso' => 'ISO 8601 duration',
+    'duration_units' => [
+        'minutes' => 'Minutes',
+        'hours' => 'Hours',
+        'days' => 'Days',
+        'weeks' => 'Weeks',
+        'other' => 'Other (ISO 8601)',
+    ],
+    'durations' => [
+        'years' => ':count year|:count years',
+        'months' => ':count month|:count months',
+        'weeks' => ':count week|:count weeks',
+        'days' => ':count day|:count days',
+        'hours' => ':count hour|:count hours',
+        'minutes' => ':count minute|:count minutes',
+        'seconds' => ':count second|:count seconds',
+    ],
     'step_settings' => 'Step settings',
 
     // The word above each step card.

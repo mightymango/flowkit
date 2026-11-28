@@ -30,6 +30,23 @@ abstract class Brick
     }
 
     /**
+     * A short, readable description of a step's settings for its card, e.g.
+     * "7 days" for a wait. By default each field's summary, in order.
+     */
+    public function summary(array $settings): string
+    {
+        $parts = [];
+
+        foreach ($this->fields() as $field) {
+            if (array_key_exists($field->name, $settings) && ($part = $field->summarise($settings[$field->name])) !== null) {
+                $parts[] = $part;
+            }
+        }
+
+        return implode(' · ', $parts);
+    }
+
+    /**
      * Validation rules built from the fields, keyed by setting name.
      */
     public function rules(): array
