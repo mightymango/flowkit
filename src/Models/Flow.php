@@ -107,6 +107,14 @@ class Flow extends Model
         return $version;
     }
 
+    /** The owner's name (or email) for display, if the flow has an owner. */
+    public function ownerName(): ?string
+    {
+        $owner = $this->owner;
+
+        return $owner ? (data_get($owner, 'name') ?? data_get($owner, 'email')) : null;
+    }
+
     public function isRunnable(): bool
     {
         return $this->status === FlowStatus::Live
