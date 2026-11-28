@@ -46,7 +46,6 @@ class FlowRun extends Model
         return $this->belongsTo(FlowVersion::class, 'flow_version_id');
     }
 
-    /** @return HasMany<FlowRunStep, $this> */
     protected static function booted(): void
     {
         // Claims aren't tied by a foreign key, so remove them here, including
@@ -60,6 +59,7 @@ class FlowRun extends Model
         return $this->hasMany(FlowClaim::class);
     }
 
+    /** @return HasMany<FlowRunStep, $this> */
     public function steps(): HasMany
     {
         return $this->hasMany(FlowRunStep::class)->orderBy('id');
