@@ -84,4 +84,3 @@ it('shows no chips on fields that pick a value', function () {
         'variables' => [['path' => 'employee.id', 'label' => 'Employee', 'type' => 'employee']],
     ])->assertDontSeeHtml('aria-label="Insert a variable"');
 });
-
