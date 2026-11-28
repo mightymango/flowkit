@@ -1,6 +1,7 @@
 <?php
 
 use Livewire\Livewire;
+use MightyMango\Flowkit\FlowkitServiceProvider;
 use MightyMango\Flowkit\Livewire\FlowEditor;
 use MightyMango\Flowkit\Livewire\FlowList;
 use MightyMango\Flowkit\Livewire\StepSettings;
@@ -81,7 +82,7 @@ it('renders the settings panel for the selected step', function () {
 
 it('lets an app swap the settings panel', function () {
     expect(config('flowkit.components'))->toBeArray()
-        ->and(MightyMango\Flowkit\FlowkitServiceProvider::COMPONENTS['step-settings'])->toBe(StepSettings::class);
+        ->and(FlowkitServiceProvider::COMPONENTS['step-settings'])->toBe(StepSettings::class);
 });
 
 it('removes steps', function () {
