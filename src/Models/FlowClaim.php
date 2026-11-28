@@ -3,6 +3,7 @@
 namespace MightyMango\Flowkit\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * A record that a run's step has done something that must only happen once,
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $key
  * @property int|null $flow_run_id
- * @property \Illuminate\Support\Carbon|null $created_at
+ * @property Carbon|null $created_at
  */
 class FlowClaim extends Model
 {
