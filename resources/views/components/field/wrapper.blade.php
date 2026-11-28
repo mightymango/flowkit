@@ -14,7 +14,7 @@
     @endif
 
     @if ($field['supportsVariables'])
-        <p class="text-xs text-[var(--flowkit-muted)]">{!! __('flowkit::editor.variables_hint', ['placeholder' => '<code>'.e('{{ variable }}').'</code>']) !!}</p>
+        <p class="text-xs text-[var(--flowkit-muted)]">{!! __('flowkit::editor.variables_hint', ['placeholder' => '<code>&#123;&#123; variable &#125;&#125;</code>']) !!}</p>
     @endif
 
     @error('settings.'.$field['name'])

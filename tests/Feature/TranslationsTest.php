@@ -75,6 +75,16 @@ it('renders the editor in Welsh', function () {
     expect($editor->errors()->first('settings.when'))->toContain('Mynegiad');
 });
 
+it('shows the variable placeholder literally in the translated hint', function () {
+    $flow = Flow::create(['key' => 'onboarding', 'name' => 'Onboarding']);
+
+    Livewire::test(FlowEditor::class, ['flow' => $flow])
+        ->call('setTrigger', 'core.manual')
+        ->call('addStep', 'core.notify')
+        ->assertSeeHtml('<code>&#123;&#123; variable &#125;&#125;</code>')
+        ->assertDontSee('<?php', false);
+});
+
 it('renders the flow list in Welsh', function () {
     app()->setLocale('cy');
 
