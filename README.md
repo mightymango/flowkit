@@ -39,6 +39,10 @@ Import the tokens and let Tailwind see the package views:
 
 The editor lives at `/flows`. Point `flowkit.layout` at your own layout (it needs a `content` section and Livewire's assets).
 
+### Hiding flows and bricks from the editor
+
+Flows an app defines in code and re-syncs shouldn't be edited in the editor, where changes would be overwritten. List their keys in `flowkit.editor.hidden_flows` to leave them out of the flow list, the editor and run history; they still run. Bricks listed in `flowkit.editor.hidden_bricks` can't be added in the editor, e.g. `core.notify` while any email address could receive run data.
+
 ### Multi-tenant apps
 
 Flowkit has no tenancy code of its own. It uses the default database connection, queue and cache, so it works inside whatever tenant your tenancy package has initialised. With a database per tenant (e.g. stancl/tenancy):

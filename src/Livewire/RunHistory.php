@@ -30,6 +30,8 @@ class RunHistory extends Component
 
     public function mount(Flow $flow): void
     {
+        abort_unless(Flow::inEditor()->whereKey($flow->getKey())->exists(), 404);
+
         $this->flowId = $flow->id;
     }
 
@@ -40,7 +42,7 @@ class RunHistory extends Component
 
     public function render()
     {
-        $flow = Flow::findOrFail($this->flowId);
+        $flow = Flow::inEditor()->findOrFail($this->flowId);
 
         // Scoped through the flow, so a run id from another flow shows nothing.
         $selected = $this->run

@@ -64,6 +64,8 @@ class FlowEditor extends Component
 
     public function mount(Flow $flow): void
     {
+        abort_unless(Flow::inEditor()->whereKey($flow->getKey())->exists(), 404);
+
         $this->flowId = $flow->id;
 
         $definition = $flow->draft()->toDefinition();
@@ -245,7 +247,7 @@ class FlowEditor extends Component
 
     public function save(): void
     {
-        $flow = Flow::findOrFail($this->flowId);
+        $flow = Flow::inEditor()->findOrFail($this->flowId);
         $definition = new Definition($this->trigger, $this->steps);
 
         $flow->draft()->update(['definition' => $definition->toArray()]);
@@ -272,7 +274,7 @@ class FlowEditor extends Component
             return;
         }
 
-        $flow = Flow::findOrFail($this->flowId);
+        $flow = Flow::inEditor()->findOrFail($this->flowId);
 
         try {
             $flow->publish($flow->draft(), auth()->user());
@@ -306,7 +308,7 @@ class FlowEditor extends Component
     /** Fill the test panel with the trigger data of one of this flow's runs. */
     public function useRun(int $runId): void
     {
-        $run = Flow::findOrFail($this->flowId)->runs()->findOrFail($runId);
+        $run = Flow::inEditor()->findOrFail($this->flowId)->runs()->findOrFail($runId);
 
         $this->testPayload = json_encode((object) ($run->payload ?? []), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
@@ -328,7 +330,7 @@ class FlowEditor extends Component
         }
 
         $this->save();
-        $flow = Flow::findOrFail($this->flowId);
+        $flow = Flow::inEditor()->findOrFail($this->flowId);
         $draft = $flow->draft();
 
         try {
@@ -371,19 +373,19 @@ class FlowEditor extends Component
         $node = $this->selected === 'trigger' ? $this->trigger : $this->findStep($this->selected);
 
         return view('flowkit::livewire.flow-editor', [
-            'flow' => $flow = Flow::findOrFail($this->flowId),
+            'flow' => $flow = Flow::inEditor()->findOrFail($this->flowId),
             'version' => $flow->latestVersion()->value('version'),
-            'triggers' => $registry->grouped('trigger'),
-            'stepBricks' => array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition')),
+            'triggers' => $this->offered($registry->grouped('trigger')),
+            'stepBricks' => $this->offered(array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition'))),
             'labels' => $this->labels(),
             'problems' => $this->problems(),
             'summaries' => $this->summaries(),
             'selectedNode' => $node && $registry->has($node['brick']) ? $node : null,
             'testRun' => $this->testRunId
-                ? Flow::findOrFail($this->flowId)->runs()->with(['version', 'steps' => fn ($query) => $query->reorder()->orderBy('id')])->find($this->testRunId)
+                ? Flow::inEditor()->findOrFail($this->flowId)->runs()->with(['version', 'steps' => fn ($query) => $query->reorder()->orderBy('id')])->find($this->testRunId)
                 : null,
             'recentRuns' => $this->testing
-                ? Flow::findOrFail($this->flowId)->runs()->where('dry_run', false)->latest('flow_runs.id')->limit(5)->get(['flow_runs.id', 'flow_runs.started_at', 'flow_runs.created_at'])
+                ? Flow::inEditor()->findOrFail($this->flowId)->runs()->where('dry_run', false)->latest('flow_runs.id')->limit(5)->get(['flow_runs.id', 'flow_runs.started_at', 'flow_runs.created_at'])
                 : collect(),
             'destinations' => $this->selected && $this->selected !== 'trigger' ? $this->destinationsFor($this->selected) : [],
             'selectedVariables' => $this->selected ? StepVariables::before($this->trigger, $this->steps, $this->selected) : [],
@@ -543,11 +545,28 @@ class FlowEditor extends Component
         return $problems;
     }
 
+    /**
+     * Grouped bricks without `flowkit.editor.hidden_bricks`, dropping groups
+     * left empty.
+     *
+     * @param  array<string, list<array<string, mixed>>>  $groups
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function offered(array $groups): array
+    {
+        $hidden = (array) config('flowkit.editor.hidden_bricks', []);
+
+        $groups = array_map(fn (array $bricks) => array_values(array_filter($bricks, fn (array $brick) => ! in_array($brick['key'], $hidden, true))), $groups);
+
+        return array_filter($groups);
+    }
+
     private function assertBrick(string $key, ?string $type = null): void
     {
         $registry = app(BrickRegistry::class);
 
         abort_unless($registry->has($key), 422, "Unknown brick [{$key}].");
+        abort_if(in_array($key, (array) config('flowkit.editor.hidden_bricks', []), true), 422, "[{$key}] can't be added in the editor.");
 
         if ($type) {
             abort_unless($registry->all()[$key]::type() === $type, 422, "[{$key}] is not a {$type}.");

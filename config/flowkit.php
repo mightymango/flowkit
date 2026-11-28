@@ -54,6 +54,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Editor
+    |--------------------------------------------------------------------------
+    |
+    | 'hidden_flows' lists flow keys the editor, flow list and run history
+    | leave out, e.g. flows an app defines in code and re-syncs, which edits
+    | in the editor would fight with. 'hidden_bricks' lists brick keys staff
+    | can't add in the editor, e.g. 'core.notify' while any address could
+    | receive run data. Both still run as normal.
+    |
+    */
+
+    'editor' => [
+        'hidden_flows' => [],
+        'hidden_bricks' => [],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Notifications
     |--------------------------------------------------------------------------
     |
