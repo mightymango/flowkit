@@ -11,6 +11,11 @@ enum RunStatus: string
     case Failed = 'failed';
     case Skipped = 'skipped';
 
+    public function label(): string
+    {
+        return (string) __('flowkit::status.'.$this->value);
+    }
+
     public function isFinished(): bool
     {
         return in_array($this, [self::Completed, self::Failed, self::Skipped], true);

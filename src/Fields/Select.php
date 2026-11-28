@@ -40,6 +40,6 @@ class Select extends Field
 
     public function toArray(): array
     {
-        return parent::toArray() + ['options' => $this->getOptions()];
+        return parent::toArray() + ['options' => array_map(fn ($label) => __($label), $this->getOptions())];
     }
 }

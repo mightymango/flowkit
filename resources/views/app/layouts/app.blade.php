@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Flows') · {{ config('app.name') }}</title>
+    <title>@yield('title', __('flowkit::editor.flows')) · {{ config('app.name') }}</title>
     <style>[x-cloak] { display: none !important; }</style>
     @livewireStyles
 </head>

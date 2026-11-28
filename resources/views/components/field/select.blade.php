@@ -6,7 +6,7 @@
         wire:model{{ ($field['live'] ?? false) ? '.live' : '' }}="settings.{{ $field['name'] }}"
         class="w-full rounded-md border border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] px-3 py-2 text-sm text-[var(--flowkit-text)] focus:border-[var(--flowkit-accent)] focus:outline-none"
     >
-        <option value="">{{ $field['placeholder'] ?? 'Choose…' }}</option>
+        <option value="">{{ $field['placeholder'] ?? __('flowkit::editor.choose') }}</option>
         @foreach ($field['options'] ?? [] as $value => $label)
             <option value="{{ $value }}">{{ $label }}</option>
         @endforeach

@@ -86,7 +86,7 @@ final class Definition implements Arrayable, JsonSerializable
         $seen = [];
 
         if ($this->trigger && ! $bricks->has($this->trigger['brick'] ?? '')) {
-            $errors[] = "Unknown trigger brick [{$this->trigger['brick']}].";
+            $errors[] = __('flowkit::errors.unknown_trigger', ['brick' => $this->trigger['brick'] ?? '']);
         }
 
         $walk = function (array $steps, string $path) use (&$walk, &$errors, &$seen, $bricks) {
@@ -94,23 +94,23 @@ final class Definition implements Arrayable, JsonSerializable
                 $where = "{$path}[{$i}]";
 
                 if (empty($step['id'])) {
-                    $errors[] = "Step at {$where} has no id.";
+                    $errors[] = __('flowkit::errors.missing_id', ['where' => $where]);
                 } elseif (isset($seen[$step['id']])) {
-                    $errors[] = "Duplicate step id [{$step['id']}].";
+                    $errors[] = __('flowkit::errors.duplicate_id', ['id' => $step['id']]);
                 } else {
                     $seen[$step['id']] = true;
                 }
 
                 if (empty($step['brick'])) {
-                    $errors[] = "Step at {$where} has no brick.";
+                    $errors[] = __('flowkit::errors.missing_brick', ['where' => $where]);
                 } elseif (! $bricks->has($step['brick'])) {
-                    $errors[] = "Unknown brick [{$step['brick']}] at {$where}.";
+                    $errors[] = __('flowkit::errors.unknown_brick', ['brick' => $step['brick'], 'where' => $where]);
                 }
 
                 $condition = $step['settings']['condition'] ?? null;
                 if (is_string($condition) && $condition !== ''
                     && ! array_key_exists($condition, $bricks->all('condition'))) {
-                    $errors[] = "Unknown condition [{$condition}] at {$where}.";
+                    $errors[] = __('flowkit::errors.unknown_condition', ['condition' => $condition, 'where' => $where]);
                 }
 
                 foreach ($step['branches'] ?? [] as $name => $children) {

@@ -135,7 +135,12 @@ class FlowEditor extends Component
         // Validate the settings on their own, exactly as the runner does, so
         // rules that refer to other settings (e.g. required_without) resolve.
         $this->resetValidation();
-        $validator = Validator::make($this->settings, app(BrickRegistry::class)->resolve($node['brick'])->rulesFor($this->settings));
+        $brick = app(BrickRegistry::class)->resolve($node['brick']);
+        $validator = Validator::make(
+            $this->settings,
+            $brick->rulesFor($this->settings),
+            attributes: array_column($this->fieldsFor($brick), 'label', 'name'),
+        );
 
         if ($validator->fails()) {
             foreach ($validator->errors()->messages() as $key => $messages) {
@@ -202,7 +207,7 @@ class FlowEditor extends Component
             'flow' => Flow::findOrFail($this->flowId),
             'triggers' => $registry->grouped('trigger'),
             'stepBricks' => array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition')),
-            'labels' => array_map(fn ($class) => $class::$label, $registry->all()),
+            'labels' => array_map(fn ($class) => __($class::$label), $registry->all()),
             'selectedBrick' => $brick,
             'fields' => $brick ? $this->fieldsFor($brick) : [],
         ]);
