@@ -2,6 +2,7 @@
 
 namespace MightyMango\Flowkit\Livewire;
 
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -141,6 +142,55 @@ class FlowEditor extends Component
 
         $this->remember();
         $this->steps = $move($this->steps);
+    }
+
+    /**
+     * wire:sort's handler: a step was dropped at a position in a list,
+     * either the main flow (`root`) or a branch (`<branch step id>:<name>`).
+     */
+    public function handleSort(string $id, int $position, string $list = 'root'): void
+    {
+        $this->moveTo($id, $list, $position);
+    }
+
+    /**
+     * Move a step, with any steps inside it, to a position in a list (the
+     * end by default). The keyboard alternative to dragging. A step can't
+     * move into one of its own branches.
+     */
+    public function moveTo(string $id, string $list, ?int $position = null): void
+    {
+        $node = $this->findStep($id);
+
+        if (! $node || $list === '' || ! array_key_exists($list, $this->destinations())) {
+            return;
+        }
+
+        [$parentId, $branch] = $list === 'root' ? [null, null] : explode(':', $list, 2);
+
+        if ($parentId !== null && ($parentId === $id || $this->containsStep($node, $parentId))) {
+            return;
+        }
+
+        $this->remember();
+        $steps = $this->filterTree($this->steps, fn (array $step) => $step['id'] !== $id);
+
+        $insert = function (array $list) use ($node, $position): array {
+            $at = $position === null ? count($list) : max(0, min(count($list), $position));
+            array_splice($list, $at, 0, [$node]);
+
+            return $list;
+        };
+
+        $this->steps = $parentId === null
+            ? $insert($steps)
+            : $this->mapTree($steps, function (array $step) use ($parentId, $branch, $insert) {
+                if ($step['id'] === $parentId && isset($step['branches'][$branch])) {
+                    $step['branches'][$branch] = $insert($step['branches'][$branch]);
+                }
+
+                return $step;
+            });
     }
 
     public function select(?string $id): void
@@ -329,6 +379,7 @@ class FlowEditor extends Component
             'recentRuns' => $this->testing
                 ? Flow::findOrFail($this->flowId)->runs()->where('dry_run', false)->latest('flow_runs.id')->limit(5)->get(['flow_runs.id', 'flow_runs.started_at', 'flow_runs.created_at'])
                 : collect(),
+            'destinations' => $this->selected && $this->selected !== 'trigger' ? $this->destinationsFor($this->selected) : [],
             'selectedVariables' => $this->selected ? StepVariables::before($this->trigger, $this->steps, $this->selected) : [],
         ]);
     }
@@ -363,6 +414,74 @@ class FlowEditor extends Component
         $collect($this->steps);
 
         return $summaries;
+    }
+
+    /**
+     * Every list a step can be moved to, keyed as for moveTo(), with a label.
+     *
+     * @return array<string, string>
+     */
+    private function destinations(): array
+    {
+        $labels = $this->labels();
+        $destinations = ['root' => (string) __('flowkit::editor.main_flow')];
+
+        $collect = function (array $steps) use (&$collect, &$destinations, $labels): void {
+            foreach ($steps as $step) {
+                foreach ($step['branches'] ?? [] as $name => $children) {
+                    $branch = Lang::has("flowkit::editor.branches.{$name}") ? __("flowkit::editor.branches.{$name}") : Str::headline($name);
+                    $destinations["{$step['id']}:{$name}"] = ($labels[$step['brick']] ?? $step['brick'])." ({$step['id']}) → {$branch}";
+                    $collect($children);
+                }
+            }
+        };
+
+        $collect($this->steps);
+
+        return $destinations;
+    }
+
+    /**
+     * Where the selected step can move: every list except its own branches.
+     *
+     * @return array<string, string>
+     */
+    private function destinationsFor(string $id): array
+    {
+        $node = $this->findStep($id);
+
+        return array_filter(
+            $this->destinations(),
+            fn (string $list) => $list === 'root' || ($node && ! in_array(explode(':', $list)[0], [$id, ...$this->descendantIds($node)], true)),
+            ARRAY_FILTER_USE_KEY,
+        );
+    }
+
+    /** @return list<string> */
+    private function descendantIds(array $node): array
+    {
+        $ids = [];
+
+        foreach ($node['branches'] ?? [] as $children) {
+            foreach ($children as $child) {
+                $ids = [...$ids, $child['id'], ...$this->descendantIds($child)];
+            }
+        }
+
+        return $ids;
+    }
+
+    private function containsStep(array $node, string $id): bool
+    {
+        foreach ($node['branches'] ?? [] as $children) {
+            foreach ($children as $child) {
+                if ($child['id'] === $id || $this->containsStep($child, $id)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /** Record the tree before a change, for undo, and mark the editor dirty. */
