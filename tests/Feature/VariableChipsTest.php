@@ -66,7 +66,7 @@ it('shows chips on fields that take variables, inserting placeholders', function
     settingsPanel($editor)
         ->assertSeeHtml('aria-label="Insert a variable"')
         ->assertSeeHtml('Set a variable: Value')
-        ->assertSeeHtml("let text = '{{ steps.{$first}.value }}'")
+        ->assertSeeHtml("let text = '{{ steps.{$first}.value }}';")
         ->assertDontSeeHtml('echo e(')
         ->assertSeeHtml('title="schedule.scheduled_at"');
 });
