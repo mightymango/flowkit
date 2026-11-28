@@ -32,13 +32,26 @@ class Expression
     }
 
     /**
+     * The expression inside a value that is exactly one `{{ placeholder }}`,
+     * or null. Such a value takes the evaluated value's type when resolved.
+     */
+    public static function lonePlaceholder(mixed $value): ?string
+    {
+        if (is_string($value) && substr_count($value, '{{') === 1 && preg_match('/^\s*\{\{(.+)\}\}\s*$/s', $value, $match)) {
+            return trim($match[1]);
+        }
+
+        return null;
+    }
+
+    /**
      * Replace every `{{ expression }}` in a string. A string that is just one
      * placeholder keeps the evaluated value's type.
      */
     public function render(string $template, Context|array $context): mixed
     {
-        if (substr_count($template, '{{') === 1 && preg_match('/^\s*\{\{(.+)\}\}\s*$/s', $template, $match)) {
-            return $this->evaluate(trim($match[1]), $context);
+        if (($expression = self::lonePlaceholder($template)) !== null) {
+            return $this->evaluate($expression, $context);
         }
 
         return preg_replace_callback(

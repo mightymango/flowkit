@@ -124,6 +124,15 @@ abstract class Field implements Arrayable
         return array_merge([$this->required ? 'required' : 'nullable'], $this->baseRules(), $this->rules);
     }
 
+    /**
+     * The rules the editor applies, before placeholders are resolved. Most
+     * fields check the same as the runner; a Number accepts a placeholder.
+     */
+    public function getEditorRules(): array
+    {
+        return $this->getRules();
+    }
+
     protected function baseRules(): array
     {
         return [];

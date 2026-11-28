@@ -191,6 +191,17 @@ class SendTeamsMessage extends Action
 
 Bricks in `app/Flows` are discovered automatically; others can be listed in `config/flowkit.php`.
 
+### Fields
+
+A brick's `fields()` declare its settings. Each field renders in the editor and supplies the validation rules that the editor and the runner both apply.
+
+| Field | Stores | Notes |
+| --- | --- | --- |
+| `Text`, `Textarea` | A string | `->supportsVariables()` allows `{{ placeholders }}` |
+| `Select` | One of `->options([...])` | Options can be a closure |
+| `Number` | A number | `->integer()`, `->min()`, `->max()`. With `->supportsVariables()`, the editor accepts a single `{{ placeholder }}` and the runner checks the resolved value |
+| `Duration` | An ISO 8601 duration, e.g. `P7D` | |
+
 ### Conditions
 
 A `Condition` brick returns true or false. Use one in two ways:

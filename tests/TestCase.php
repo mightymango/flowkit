@@ -9,6 +9,7 @@ use MightyMango\Flowkit\Tests\Fixtures\Bricks\Flaky;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\FlakySend;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\HasRole;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\SendMessage;
+use MightyMango\Flowkit\Tests\Fixtures\Bricks\Snooze;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -28,7 +29,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('app.key', 'base64:'.base64_encode(str_repeat('a', 32)));
         $app['config']->set('database.default', 'testing');
         $app['config']->set('queue.default', 'sync');
-        $app['config']->set('flowkit.bricks.register', [SendMessage::class, HasRole::class, Flaky::class, FlakySend::class]);
+        $app['config']->set('flowkit.bricks.register', [SendMessage::class, HasRole::class, Flaky::class, FlakySend::class, Snooze::class]);
     }
 
     protected function setUp(): void
