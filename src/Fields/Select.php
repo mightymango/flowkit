@@ -4,6 +4,7 @@ namespace MightyMango\Flowkit\Fields;
 
 use Closure;
 use Illuminate\Validation\Rule;
+use MightyMango\Flowkit\Engine\Expression;
 
 class Select extends Field
 {
@@ -30,7 +31,7 @@ class Select extends Field
 
             foreach ($this->availableVariables as $variable) {
                 if ($variable['type'] === $this->variableType) {
-                    $options['{{ '.$variable['path'].' }}'] = $variable['label'];
+                    $options[Expression::placeholder($variable['path'])] = $variable['label'];
                 }
             }
 
@@ -46,6 +47,11 @@ class Select extends Field
         return $this->variableType === null
             ? $this->getRules()
             : [...$this->getRules(), Rule::in(array_keys($this->getOptions()))];
+    }
+
+    public function insertsVariables(): bool
+    {
+        return false;
     }
 
     public function component(): string

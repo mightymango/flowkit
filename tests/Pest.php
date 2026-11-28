@@ -2,6 +2,7 @@
 
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
+use MightyMango\Flowkit\Bricks\StepVariables;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Livewire\StepSettings;
 use MightyMango\Flowkit\Tests\TestCase;
@@ -23,6 +24,7 @@ function settingsPanel(Testable $editor, ?string $stepId = null): Testable
         'stepId' => $stepId,
         'brick' => $node['brick'],
         'settings' => $node['settings'] ?? [],
+        'variables' => StepVariables::before($editor->get('trigger'), $editor->get('steps'), $stepId),
     ]);
 }
 

@@ -30,6 +30,18 @@ abstract class Brick
     }
 
     /**
+     * What a step of this brick puts into the run for later steps, under
+     * `steps.<id>.<key>`, as key => label (or label and type, as for trigger
+     * variables). The editor offers them as variable chips.
+     *
+     * @return array<string, string|array{label: string, type?: string}>
+     */
+    public function outputs(): array
+    {
+        return [];
+    }
+
+    /**
      * A short, readable description of a step's settings for its card, e.g.
      * "7 days" for a wait. By default each field's summary, in order.
      *

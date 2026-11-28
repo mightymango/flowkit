@@ -8,7 +8,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\Branch;
-use MightyMango\Flowkit\Bricks\TriggerVariables;
+use MightyMango\Flowkit\Bricks\StepVariables;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 use MightyMango\Flowkit\Fields\SettingsForm;
@@ -131,7 +131,7 @@ class FlowEditor extends Component
         }
 
         $brick = app(BrickRegistry::class)->resolve($node['brick']);
-        $variables = $stepId === 'trigger' ? [] : TriggerVariables::for($this->trigger);
+        $variables = StepVariables::before($this->trigger, $this->steps, $stepId);
         $validator = SettingsForm::for($brick, $variables)->validator($settings);
 
         if ($validator->fails()) {
@@ -196,6 +196,7 @@ class FlowEditor extends Component
             'labels' => array_map(fn ($class) => __($class::$label), $registry->all()),
             'summaries' => $this->summaries(),
             'selectedNode' => $node && $registry->has($node['brick']) ? $node : null,
+            'selectedVariables' => $this->selected ? StepVariables::before($this->trigger, $this->steps, $this->selected) : [],
         ]);
     }
 
@@ -208,14 +209,15 @@ class FlowEditor extends Component
     private function summaries(): array
     {
         $registry = app(BrickRegistry::class);
-        $variables = TriggerVariables::for($this->trigger);
         $summaries = [];
 
-        $collect = function (array $nodes) use (&$collect, &$summaries, $registry, $variables): void {
+        $collect = function (array $nodes) use (&$collect, &$summaries, $registry): void {
             foreach ($nodes as $id => $node) {
+                $stepId = $node['id'] ?? $id;
+
                 if ($registry->has($node['brick'] ?? '')) {
-                    $summaries[$node['id'] ?? $id] = $registry->resolve($node['brick'])
-                        ->summary($node['settings'] ?? [], $id === 'trigger' ? [] : $variables);
+                    $summaries[$stepId] = $registry->resolve($node['brick'])
+                        ->summary($node['settings'] ?? [], StepVariables::before($this->trigger, $this->steps, $stepId));
                 }
 
                 foreach ($node['branches'] ?? [] as $children) {

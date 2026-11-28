@@ -171,6 +171,15 @@ abstract class Field implements Arrayable
         return is_scalar($value) && $value !== '' ? (string) $value : null;
     }
 
+    /**
+     * Whether the editor shows variable chips that insert `{{ placeholder }}`
+     * text into this field. Fields that pick a value instead turn this off.
+     */
+    public function insertsVariables(): bool
+    {
+        return $this->supportsVariables;
+    }
+
     public function toArray(): array
     {
         return [

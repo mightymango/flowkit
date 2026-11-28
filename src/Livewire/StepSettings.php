@@ -6,7 +6,6 @@ use Livewire\Attributes\Locked;
 use Livewire\Component;
 use MightyMango\Flowkit\Bricks\Brick;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
-use MightyMango\Flowkit\Bricks\TriggerVariables;
 use MightyMango\Flowkit\Fields\ModelPicker;
 use MightyMango\Flowkit\Fields\SettingsForm;
 
@@ -26,20 +25,25 @@ class StepSettings extends Component
     #[Locked]
     public string $brick;
 
-    /** The flow's trigger node, whose variables fields can offer. */
+    /**
+     * The variables this step can use: the trigger's, and earlier steps'
+     * outputs. Fields offer them as options and chips.
+     *
+     * @var list<array{path: string, label: string, type: string|null}>
+     */
     #[Locked]
-    public ?array $trigger = null;
+    public array $variables = [];
 
     public array $settings = [];
 
-    public function mount(string $stepId, string $brick, array $settings = [], ?array $trigger = null): void
+    public function mount(string $stepId, string $brick, array $settings = [], array $variables = []): void
     {
         abort_unless(app(BrickRegistry::class)->has($brick), 422, "Unknown brick [{$brick}].");
 
         $this->stepId = $stepId;
         $this->brick = $brick;
         $this->settings = $settings;
-        $this->trigger = $trigger;
+        $this->variables = $variables;
     }
 
     public function apply(): void
@@ -91,7 +95,7 @@ class StepSettings extends Component
 
     private function form(): SettingsForm
     {
-        return SettingsForm::for($this->brickInstance(), TriggerVariables::for($this->trigger));
+        return SettingsForm::for($this->brickInstance(), $this->variables);
     }
 
     private function brickInstance(): Brick

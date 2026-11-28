@@ -26,6 +26,7 @@ return [
     'required' => 'required',
     'variables_hint' => 'Use :placeholder to insert data from earlier steps.',
     'duration_placeholder' => 'P7D (7 days), PT2H (2 hours)',
+    'insert_variable' => 'Insert a variable',
     'clear_choice' => 'Clear the choice',
     'search_records' => 'Type to search',
     'no_records' => 'No matches',

@@ -18,6 +18,11 @@ class SetVariable extends Action
 
     public static string $group = 'Logic';
 
+    public function outputs(): array
+    {
+        return ['value' => 'Value'];
+    }
+
     public function fields(): array
     {
         return [

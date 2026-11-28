@@ -55,7 +55,7 @@ it('searches only the declared columns and scope, escaping wildcards', function 
     Employee::create(['name' => 'Ana Left', 'status' => 'left']);
     Employee::create(['name' => '100% Cat']);
 
-    $panel = Livewire::test(StepSettings::class, ['stepId' => 's1', 'brick' => 'test.assign', 'trigger' => $this->trigger]);
+    $panel = Livewire::test(StepSettings::class, ['stepId' => 's1', 'brick' => 'test.assign', 'variables' => TriggerVariables::for($this->trigger)]);
 
     expect(collect($panel->instance()->searchRecords('mentor_id', 'an'))->pluck('label')->all())->toBe(['Ana', 'Ben'])
         ->and($panel->instance()->searchRecords('mentor_id', 'deliv'))->toBe([['value' => 1, 'label' => 'Ana']])
