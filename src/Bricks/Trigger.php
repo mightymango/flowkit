@@ -11,14 +11,28 @@ namespace MightyMango\Flowkit\Bricks;
 abstract class Trigger extends Brick
 {
     /**
-     * Variables this trigger provides, as dot paths mapped to labels,
-     * e.g. ['employee.name' => 'Employee name'].
+     * Variables this trigger provides, as dot paths mapped to a label, or
+     * to a label and a type that fields can ask for with ->variables():
      *
-     * @return array<string, string>
+     *   ['employee.name' => 'Employee name',
+     *    'employee.manager_id' => ['label' => 'Manager', 'type' => 'user']]
+     *
+     * @return array<string, string|array{label: string, type?: string}>
      */
     public function variables(): array
     {
         return [];
+    }
+
+    /**
+     * The variables for a trigger with these settings. Override when they
+     * depend on the settings, e.g. on which model the trigger watches.
+     *
+     * @return array<string, string|array{label: string, type?: string}>
+     */
+    public function variablesFor(array $settings): array
+    {
+        return $this->variables();
     }
 
     /**

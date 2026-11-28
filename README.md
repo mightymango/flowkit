@@ -193,6 +193,8 @@ class SendTeamsMessage extends Action
 
 Bricks in `app/Flows` are discovered automatically; others can be listed in `config/flowkit.php`.
 
+A trigger declares the variables it puts into the run in `variables()` (or `variablesFor($settings)` when they depend on its settings). A variable can have a type, which selects ask for: `'employee.manager_id' => ['label' => 'Manager', 'type' => 'user']`.
+
 ### Fields
 
 A brick's `fields()` declare its settings. Each field renders in the editor and supplies the validation rules that the editor and the runner both apply.
@@ -200,7 +202,8 @@ A brick's `fields()` declare its settings. Each field renders in the editor and 
 | Field | Stores | Notes |
 | --- | --- | --- |
 | `Text`, `Textarea` | A string | `->supportsVariables()` allows `{{ placeholders }}` |
-| `Select` | One of `->options([...])` | Options can be a closure |
+| `Select` | One of `->options([...])` | Options can be a closure. `->variables('user')` offers the trigger's variables of that type instead |
+| `ModelPicker` | A record's key | `->model(User::class)->searchUsing(['name', 'email'])->display('name')`, optional `->scope()`. Only the declared model and columns are searched |
 | `Number` | A number | `->integer()`, `->min()`, `->max()`. With `->supportsVariables()`, the editor accepts a single `{{ placeholder }}` and the runner checks the resolved value |
 | `Duration` | An ISO 8601 duration, e.g. `P7D` | |
 

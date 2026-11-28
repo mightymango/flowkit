@@ -32,13 +32,15 @@ abstract class Brick
     /**
      * A short, readable description of a step's settings for its card, e.g.
      * "7 days" for a wait. By default each field's summary, in order.
+     *
+     * @param  list<array{path: string, label: string, type: string|null}>  $variables  the flow's trigger variables
      */
-    public function summary(array $settings): string
+    public function summary(array $settings, array $variables = []): string
     {
         $parts = [];
 
         foreach ($this->fields() as $field) {
-            if (array_key_exists($field->name, $settings) && ($part = $field->summarise($settings[$field->name])) !== null) {
+            if (array_key_exists($field->name, $settings) && ($part = $field->withVariables($variables)->summarise($settings[$field->name])) !== null) {
                 $parts[] = $part;
             }
         }
