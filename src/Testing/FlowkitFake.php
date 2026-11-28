@@ -10,8 +10,8 @@ use MightyMango\Flowkit\Events\StepFinished;
 use MightyMango\Flowkit\Flowkit;
 use MightyMango\Flowkit\Models\Flow;
 use MightyMango\Flowkit\Models\FlowRun;
-use MightyMango\Flowkit\Models\FlowVersion;
 use MightyMango\Flowkit\Models\FlowRunStep;
+use MightyMango\Flowkit\Models\FlowVersion;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
