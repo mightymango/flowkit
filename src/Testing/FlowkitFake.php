@@ -11,6 +11,7 @@ use MightyMango\Flowkit\Flowkit;
 use MightyMango\Flowkit\Models\Flow;
 use MightyMango\Flowkit\Models\FlowRun;
 use MightyMango\Flowkit\Models\FlowRunStep;
+use MightyMango\Flowkit\Models\FlowVersion;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
@@ -55,6 +56,11 @@ class FlowkitFake extends Flowkit implements Fake
     public function run(Flow|string $flow, array $payload = [], bool $dryRun = false): FlowRun
     {
         return $this->execute($this->record($this->createRun($flow, $payload, $dryRun)));
+    }
+
+    public function testVersion(FlowVersion $version, array $payload = []): FlowRun
+    {
+        return $this->execute($this->record($this->createRunOf($version, $payload, dryRun: true)));
     }
 
     /**

@@ -9,8 +9,10 @@ use Livewire\Component;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\Branch;
 use MightyMango\Flowkit\Bricks\StepVariables;
+use MightyMango\Flowkit\Bricks\TriggerVariables;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Exceptions\InvalidDefinition;
+use MightyMango\Flowkit\Facades\Flowkit;
 use MightyMango\Flowkit\Fields\SettingsForm;
 use MightyMango\Flowkit\Models\Flow;
 
@@ -33,6 +35,15 @@ class FlowEditor extends Component
     public ?string $selected = null;
 
     public array $errorsList = [];
+
+    /** Whether the test panel is open. */
+    public bool $testing = false;
+
+    /** The test run's trigger data, as JSON. */
+    public string $testPayload = '';
+
+    #[Locked]
+    public ?int $testRunId = null;
 
     public function mount(Flow $flow): void
     {
@@ -184,6 +195,69 @@ class FlowEditor extends Component
         $this->dispatch('flowkit-published');
     }
 
+    /**
+     * Open the test panel, with trigger data shaped like the trigger's
+     * variables to fill in.
+     */
+    public function openTest(): void
+    {
+        $sample = [];
+
+        foreach (TriggerVariables::for($this->trigger) as $variable) {
+            data_set($sample, $variable['path'], '');
+        }
+
+        $this->testPayload = json_encode((object) $sample, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $this->testRunId = null;
+        $this->testing = true;
+        $this->resetValidation('testPayload');
+    }
+
+    /** Fill the test panel with the trigger data of one of this flow's runs. */
+    public function useRun(int $runId): void
+    {
+        $run = Flow::findOrFail($this->flowId)->runs()->findOrFail($runId);
+
+        $this->testPayload = json_encode((object) ($run->payload ?? []), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Save the draft and test it as a dry run with the given trigger data:
+     * unsafe actions only say what they would have done. The result shows
+     * below, and in the run history as a test run.
+     */
+    public function runTest(): void
+    {
+        $this->resetValidation('testPayload');
+        $payload = json_decode($this->testPayload, true);
+
+        if (! is_array($payload) || array_is_list($payload) && $payload !== []) {
+            $this->addError('testPayload', __('flowkit::editor.test.invalid_json'));
+
+            return;
+        }
+
+        $this->save();
+        $flow = Flow::findOrFail($this->flowId);
+        $draft = $flow->draft();
+
+        try {
+            $draft->toDefinition()->validate();
+        } catch (InvalidDefinition $e) {
+            $this->errorsList = $e->errors;
+
+            return;
+        }
+
+        $this->testRunId = Flowkit::testVersion($draft, $payload)->id;
+    }
+
+    public function closeTest(): void
+    {
+        $this->testing = false;
+        $this->testRunId = null;
+    }
+
     public function render()
     {
         $registry = app(BrickRegistry::class);
@@ -196,6 +270,12 @@ class FlowEditor extends Component
             'labels' => array_map(fn ($class) => __($class::$label), $registry->all()),
             'summaries' => $this->summaries(),
             'selectedNode' => $node && $registry->has($node['brick']) ? $node : null,
+            'testRun' => $this->testRunId
+                ? Flow::findOrFail($this->flowId)->runs()->with(['version', 'steps' => fn ($query) => $query->reorder()->orderBy('id')])->find($this->testRunId)
+                : null,
+            'recentRuns' => $this->testing
+                ? Flow::findOrFail($this->flowId)->runs()->where('dry_run', false)->latest('flow_runs.id')->limit(5)->get(['flow_runs.id', 'flow_runs.started_at', 'flow_runs.created_at'])
+                : collect(),
             'selectedVariables' => $this->selected ? StepVariables::before($this->trigger, $this->steps, $this->selected) : [],
         ]);
     }
