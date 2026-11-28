@@ -38,7 +38,7 @@ class SettingsForm
             }
         }
 
-        return array_values($fields);
+        return $fields;
     }
 
     /**
