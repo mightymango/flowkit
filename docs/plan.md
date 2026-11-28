@@ -177,7 +177,7 @@ class SendTeamsMessage extends Action
 
 **Fields** are small PHP classes that each map to a Blade component, e.g. `Select` renders `flowkit::field.select`. A new field type is a class plus a component, and the component can be published like any other.
 
-**Model triggers.** Rather than listening to every model, a host model opts in with a `HasFlowTriggers` trait that declares which events (created, updated, a status change) fire triggers.
+**Model triggers.** Rather than listening to every model, a host model opts in with a `HasFlowTriggers` trait that declares which events (created, updated, a status change) fire triggers. Publishing stores a lookup key for the live version's trigger on the flow (`flows.trigger_key`, e.g. `core.model-event:App\Models\Learner:changed`), so a save only loads flows for that model and event; the full settings check still decides the match.
 
 **Code-first flows.** `Flowkit::define('new-starter')` builds the same definition JSON in PHP. Use it for flows that should live in version control rather than be edited by staff, and for tests.
 
