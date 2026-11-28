@@ -13,6 +13,7 @@ use MightyMango\Flowkit\TriggerDispatcher;
  * @method static \MightyMango\Flowkit\Models\FlowRun start(\MightyMango\Flowkit\Models\Flow|string $flow, array $payload = [], bool $dryRun = false)
  * @method static \MightyMango\Flowkit\Models\FlowRun run(\MightyMango\Flowkit\Models\Flow|string $flow, array $payload = [], bool $dryRun = false)
  * @method static \MightyMango\Flowkit\Models\FlowRun test(\MightyMango\Flowkit\Models\Flow|string $flow, array $payload = [])
+ * @method static \MightyMango\Flowkit\Models\FlowRun testVersion(\MightyMango\Flowkit\Models\FlowVersion $version, array $payload = [])
  * @method static \MightyMango\Flowkit\Models\FlowRun retry(\MightyMango\Flowkit\Models\FlowRun $run)
  * @method static void assertStarted(\MightyMango\Flowkit\Models\Flow|string $flow, ?callable $callback = null)
  * @method static void assertStartedTimes(\MightyMango\Flowkit\Models\Flow|string $flow, int $times)

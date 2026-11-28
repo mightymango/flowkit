@@ -10,10 +10,17 @@
                     class="text-sm text-[var(--flowkit-muted)]"
                 >{{ __('flowkit::editor.saved') }}</span>
                 <a href="{{ route('flowkit.runs', $flow) }}" class="text-sm text-[var(--flowkit-muted)] hover:text-[var(--flowkit-text)]">{{ __('flowkit::runs.run_history') }}</a>
+                @if ($trigger)
+                    <x-flowkit::button wire:click="openTest">{{ __('flowkit::editor.test.button') }}</x-flowkit::button>
+                @endif
                 <x-flowkit::button wire:click="save">{{ __('flowkit::editor.save_draft') }}</x-flowkit::button>
                 <x-flowkit::button variant="primary" wire:click="publish">{{ __('flowkit::editor.publish') }}</x-flowkit::button>
             </x-flowkit::editor.header>
         </x-slot:header>
+
+        @if ($testing)
+            <x-flowkit::editor.test-panel :recent-runs="$recentRuns" :test-run="$testRun" :labels="$labels" class="mx-auto mb-6 max-w-3xl" />
+        @endif
 
         @if ($errorsList)
             <div class="mx-auto mb-6 max-w-xl rounded-md border border-[var(--flowkit-danger)]/30 p-3 text-sm text-[var(--flowkit-danger)]">
