@@ -57,7 +57,8 @@
                     :step-id="$selected"
                     :brick="$selectedNode['brick']"
                     :settings="$selectedNode['settings'] ?? []"
-                    :key="'settings-'.$selected.'-'.md5(json_encode($selectedNode['settings'] ?? []))"
+                    :trigger="$selected === 'trigger' ? null : $trigger"
+                    :key="'settings-'.$selected.'-'.md5(json_encode([$selectedNode['settings'] ?? [], $trigger]))"
                 />
             </x-slot:panel>
         @endif

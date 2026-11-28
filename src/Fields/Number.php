@@ -2,7 +2,7 @@
 
 namespace MightyMango\Flowkit\Fields;
 
-use MightyMango\Flowkit\Fields\Rules\NumberOrPlaceholder;
+use MightyMango\Flowkit\Fields\Rules\PlaceholderOr;
 
 /**
  * A number, or a single `{{ placeholder }}` that resolves to one when the
@@ -51,7 +51,7 @@ class Number extends Field
 
         return [
             $this->required ? 'required' : 'nullable',
-            new NumberOrPlaceholder($this->numericRules()),
+            new PlaceholderOr($this->numericRules()),
             ...$this->rules,
         ];
     }

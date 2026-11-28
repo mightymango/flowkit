@@ -5,6 +5,7 @@ namespace MightyMango\Flowkit\Tests;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\LivewireServiceProvider;
 use MightyMango\Flowkit\FlowkitServiceProvider;
+use MightyMango\Flowkit\Tests\Fixtures\Bricks\Assign;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\Flaky;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\FlakySend;
 use MightyMango\Flowkit\Tests\Fixtures\Bricks\HasRole;
@@ -29,7 +30,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('app.key', 'base64:'.base64_encode(str_repeat('a', 32)));
         $app['config']->set('database.default', 'testing');
         $app['config']->set('queue.default', 'sync');
-        $app['config']->set('flowkit.bricks.register', [SendMessage::class, HasRole::class, Flaky::class, FlakySend::class, Snooze::class]);
+        $app['config']->set('flowkit.bricks.register', [SendMessage::class, HasRole::class, Flaky::class, FlakySend::class, Snooze::class, Assign::class]);
     }
 
     protected function setUp(): void

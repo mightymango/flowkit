@@ -14,11 +14,17 @@ use MightyMango\Flowkit\Bricks\Core\Branch;
  */
 class SettingsForm
 {
-    public function __construct(private Brick $brick) {}
+    /**
+     * @param  list<array{path: string, label: string, type: string|null}>  $variables  the flow's trigger variables
+     */
+    public function __construct(private Brick $brick, private array $variables = []) {}
 
-    public static function for(Brick $brick): self
+    /**
+     * @param  list<array{path: string, label: string, type: string|null}>  $variables
+     */
+    public static function for(Brick $brick, array $variables = []): self
     {
-        return new self($brick);
+        return new self($brick, $variables);
     }
 
     /**
@@ -33,7 +39,7 @@ class SettingsForm
         $fields = [];
 
         foreach ($this->fieldObjects($settings) as $name => $field) {
-            $fields[] = ['name' => $name] + $field->toArray();
+            $fields[] = ['name' => $name] + $field->present(data_get($settings, $name)) + $field->toArray();
         }
 
         return $fields;
@@ -70,18 +76,22 @@ class SettingsForm
         return $rules;
     }
 
-    /** @return array<string, Field> */
-    private function fieldObjects(array $settings): array
+    /**
+     * The brick's fields keyed by setting name, given the trigger's variables.
+     *
+     * @return array<string, Field>
+     */
+    public function fieldObjects(array $settings): array
     {
         $fields = [];
 
         foreach ($this->brick->fields() as $field) {
-            $fields[$field->name] = $field;
+            $fields[$field->name] = $field->withVariables($this->variables);
         }
 
         if ($this->brick instanceof Branch) {
             foreach ($this->brick->conditionFields($settings) as $field) {
-                $fields["condition_settings.{$field->name}"] = $field;
+                $fields["condition_settings.{$field->name}"] = $field->withVariables($this->variables);
             }
         }
 

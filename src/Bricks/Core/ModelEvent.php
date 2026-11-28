@@ -2,6 +2,7 @@
 
 namespace MightyMango\Flowkit\Bricks\Core;
 
+use Illuminate\Support\Str;
 use MightyMango\Flowkit\Bricks\Trigger;
 use MightyMango\Flowkit\Fields\Select;
 use MightyMango\Flowkit\Fields\Text;
@@ -37,5 +38,28 @@ class ModelEvent extends Trigger
             Text::make('from')->label('From value')->placeholder('Any value'),
             Text::make('to')->label('To value')->placeholder('Any value'),
         ];
+    }
+
+    /**
+     * The watched record, by its snake-cased class name (`employee.id`,
+     * typed as `employee`), and for a change, its old and new values.
+     */
+    public function variablesFor(array $settings): array
+    {
+        $model = ltrim((string) ($settings['model'] ?? ''), '\\');
+
+        if ($model === '') {
+            return [];
+        }
+
+        $alias = Str::snake(class_basename($model));
+        $variables = ["{$alias}.id" => ['label' => Str::headline($alias), 'type' => $alias]];
+
+        if (($settings['event'] ?? null) === 'changed' && ! empty($settings['attribute'])) {
+            $variables["changes.{$settings['attribute']}.from"] = 'Previous value';
+            $variables["changes.{$settings['attribute']}.to"] = 'New value';
+        }
+
+        return $variables;
     }
 }
