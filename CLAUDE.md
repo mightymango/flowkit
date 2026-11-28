@@ -34,7 +34,7 @@ CI (`.github/workflows/tests.yml`) runs PHP 8.2–8.5 against Laravel 12 and 13 
 - **Published versions are immutable.** Edit a draft (`$flow->draft()`), then `publish()`. Runs always use the version they started on.
 - **Expressions are sandboxed.** Never evaluate user input with `eval`, Blade or `include`. Don't register ExpressionLanguage functions unless an issue asks for a specific, safe one.
 - **Validate settings server-side** from the brick's fields, in both the runner and the editor. Never trust the Livewire payload.
-- **Unsafe actions** (`$retrySafe = false`) must use `$context->idempotencyKey($stepId)` and must not run for real in dry-run mode.
+- **Unsafe actions** (`$retrySafe = false`) must claim the step with `$context->claimOnce()` before their side effect (never the cache: it can be evicted, and tenancy cache tagging breaks stores without tags) and must not run for real in dry-run mode.
 - **No Vue, React or other JS framework.** The UI is Livewire and Blade, plus the Alpine bundled with Livewire. Don't add a `package.json` or a JS build step.
 - **Blade components:** take data as props and merge `$attributes` onto the root element. Style with Tailwind classes that reference the `--flowkit-*` tokens in `resources/css/flowkit.css`. Treat a prop change as a breaking change once phase 4 starts.
 - **Laravel 12 and 13.** Support the current major and the previous one; add Laravel 14 when it's released (it needs PHP 8.4) and drop 12 when its security support ends. Laravel 11 is out: Composer's security-advisory policy blocks every 11.x release.

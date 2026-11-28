@@ -4,7 +4,6 @@ namespace MightyMango\Flowkit\Bricks\Core;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Validator;
 use MightyMango\Flowkit\Bricks\Action;
@@ -87,9 +86,7 @@ class Notify extends Action
             return Result::fail('No user was found for the recipient.');
         }
 
-        $ttl = now()->addDays((int) config('flowkit.retention_days', 90));
-
-        if (! Cache::add($context->idempotencyKey($stepId), true, $ttl)) {
+        if (! $context->claimOnce($stepId)) {
             return Result::skip(['sent' => false, 'already_sent' => true]);
         }
 

@@ -164,7 +164,13 @@ class SendTeamsMessage extends Action
 
     public function handle(Context $context, array $settings): Result
     {
-        // $context->idempotencyKey('...') for anything that mustn't happen twice
+        // Claim the step before sending, so a retry can't send twice.
+        if (! $context->claimOnce()) {
+            return Result::skip(['already_sent' => true]);
+        }
+
+        // ...send the message...
+
         return Result::ok(['message_id' => $id]);
     }
 }
@@ -198,7 +204,7 @@ Core bricks: `core.manual`, `core.model-event`, `core.schedule`, `core.branch`, 
 If an action throws, its step is tried again after a backoff, and each attempt is recorded in `flow_run_steps.attempt`. By default that's 3 attempts in all, waiting 10s, then 60s, then 300s, set in `flowkit.retries`. An action can set its own `public static ?int $tries`.
 
 - **Not retried:** a step whose settings fail validation, or an action that returns `Result::fail()`.
-- **Unsafe actions** (`$retrySafe = false`) get one attempt. The exception is one that sets `public static bool $usesIdempotencyKey = true`, meaning its `handle()` checks `$context->idempotencyKey($stepId)` before doing anything that mustn't happen twice.
+- **Unsafe actions** (`$retrySafe = false`) get one attempt. The exception is one that sets `public static bool $usesIdempotencyKey = true`, meaning its `handle()` calls `$context->claimOnce()` before doing anything that mustn't happen twice. The claim is a row in the `flow_claims` table, keyed by run and step, and is deleted with its run; it doesn't use the cache, so it works with any cache store, including under tenancy packages that tag cache calls.
 
 Resume a failed run from the step that failed:
 

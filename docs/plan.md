@@ -89,7 +89,7 @@ Runs always point at a version, never at the flow. Editing a flow creates a new 
 
 **Expressions.** Templated strings, such as `{{ employee.name }}`, and conditions are evaluated with Symfony ExpressionLanguage against a whitelisted context. They are never evaluated with `eval` or Blade.
 
-**Retries and idempotency.** Each action declares whether it is safe to retry. Unsafe actions (sending a message, calling an external API) carry an idempotency key made from run ID and step ID, so a retried job doesn't send twice.
+**Retries and idempotency.** Each action declares whether it is safe to retry. Unsafe actions (sending a message, calling an external API) carry an idempotency key made from run ID and step ID, so a retried job doesn't send twice. The action claims that key with `$context->claimOnce()`, which inserts it into `flow_claims` (unique key, deleted with the run). The claim is in the database rather than the cache because cache entries can be evicted, and because tenancy packages that tag cache calls break stores without tags (#64).
 
 ## UI layer
 
