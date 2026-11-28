@@ -33,6 +33,11 @@ class Branch extends Brick
         private BrickRegistry $bricks,
     ) {}
 
+    public function outputs(): array
+    {
+        return ['branch' => 'Branch taken'];
+    }
+
     public function fields(): array
     {
         return [

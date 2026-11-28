@@ -28,9 +28,13 @@ function coreBrickTexts(): array
         $brick = app($class);
         $texts = [...$texts, $class::$label, $class::$group, ...array_filter([$class::$description])];
 
+        $labels = fn (array $variables) => array_map(fn ($v) => is_array($v) ? $v['label'] : $v, array_values($variables));
+
         if ($brick instanceof Trigger) {
-            $texts = [...$texts, ...array_values($brick->variables())];
+            $texts = [...$texts, ...$labels($brick->variables())];
         }
+
+        $texts = [...$texts, ...$labels($brick->outputs())];
 
         foreach ($brick->fields() as $field) {
             $texts = [...$texts, ...array_filter([(fn () => $this->label)->call($field), (fn () => $this->help)->call($field)])];

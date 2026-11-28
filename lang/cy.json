@@ -39,5 +39,7 @@
     "When a record changes": "Pan fydd cofnod yn newid",
     "{{ employee.manager_id }} or someone@example.com": "{{ employee.manager_id }} neu rhywun@example.com",
     "Previous value": "Gwerth blaenorol",
-    "New value": "Gwerth newydd"
+    "New value": "Gwerth newydd",
+    "Branch taken": "Llwybr a ddilynwyd",
+    "Sent": "Wedi’i anfon"
 }

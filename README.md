@@ -191,6 +191,8 @@ class SendTeamsMessage extends Action
 
 Bricks in `app/Flows` are discovered automatically; others can be listed in `config/flowkit.php`.
 
+An action declares what it puts into the run for later steps in `outputs()`, e.g. `['message_id' => 'Message ID']`, available as `{{ steps.<id>.message_id }}`. In the editor, fields that take variables show chips that insert the trigger's variables and the outputs of steps that always run before this one (not steps inside a branch that may not have run).
+
 A trigger declares the variables it puts into the run in `variables()` (or `variablesFor($settings)` when they depend on its settings). A variable can have a type, which selects ask for: `'employee.manager_id' => ['label' => 'Manager', 'type' => 'user']`.
 
 ### Fields
