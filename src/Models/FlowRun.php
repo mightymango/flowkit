@@ -46,6 +46,19 @@ class FlowRun extends Model
         return $this->belongsTo(FlowVersion::class, 'flow_version_id');
     }
 
+    protected static function booted(): void
+    {
+        // Claims aren't tied by a foreign key, so remove them here, including
+        // when old runs are pruned.
+        static::deleting(fn (FlowRun $run) => $run->claims()->delete());
+    }
+
+    /** @return HasMany<FlowClaim, $this> */
+    public function claims(): HasMany
+    {
+        return $this->hasMany(FlowClaim::class);
+    }
+
     /** @return HasMany<FlowRunStep, $this> */
     public function steps(): HasMany
     {

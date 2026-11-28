@@ -3,6 +3,8 @@
 namespace MightyMango\Flowkit\Engine;
 
 use Illuminate\Support\Arr;
+use LogicException;
+use MightyMango\Flowkit\Models\FlowClaim;
 
 /**
  * The data a run carries from step to step. The trigger payload is merged in
@@ -67,6 +69,26 @@ final class Context
     public function idempotencyKey(string $stepId): string
     {
         return 'flowkit:'.($this->runId ?? 'adhoc').':'.$stepId;
+    }
+
+    /**
+     * Claim this run's step before doing something that must only happen
+     * once, such as sending an email. Returns true the first time, and false
+     * on every later attempt (a retry, or the same job running twice), so:
+     *
+     *   if (! $context->claimOnce()) {
+     *       return Result::skip(['already_sent' => true]);
+     *   }
+     *
+     * The claim is stored in the database, in the same place as the run,
+     * so it doesn't depend on the app's cache store. Claim before the side
+     * effect, not after it.
+     */
+    public function claimOnce(?string $stepId = null): bool
+    {
+        $stepId ??= $this->stepId ?? throw new LogicException('claimOnce() needs a step id: the runner has not said which step is running.');
+
+        return FlowClaim::claim($this->idempotencyKey($stepId), $this->runId);
     }
 
     public function all(): array
