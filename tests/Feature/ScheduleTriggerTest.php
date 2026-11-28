@@ -126,15 +126,13 @@ it('rejects an unknown time zone', function () {
 it('validates the cron in the editor', function () {
     $flow = Flow::create(['key' => 'digest', 'name' => 'Digest']);
 
-    Livewire::test(FlowEditor::class, ['flow' => $flow])
-        ->call('setTrigger', 'core.schedule')
-        ->set('settings.cron', 'every monday')
-        ->call('applySettings')
-        ->assertHasErrors('settings.cron')
-        ->set('settings.cron', '0 9 * * 1')
-        ->call('applySettings')
-        ->assertHasNoErrors()
-        ->assertSet('trigger.settings.cron', '0 9 * * 1');
+    $editor = Livewire::test(FlowEditor::class, ['flow' => $flow])
+        ->call('setTrigger', 'core.schedule');
+
+    applySettings($editor, ['cron' => 'every monday'])->assertHasErrors('settings.cron');
+    applySettings($editor, ['cron' => '0 9 * * 1'])->assertHasNoErrors();
+
+    $editor->assertSet('trigger.settings.cron', '0 9 * * 1');
 });
 
 it('skips a stored flow whose cron is invalid', function () {

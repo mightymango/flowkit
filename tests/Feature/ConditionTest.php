@@ -122,15 +122,17 @@ it('picks a condition for a branch in the editor and shows its fields', function
     $editor = Livewire::test(FlowEditor::class, ['flow' => $flow])
         ->call('setTrigger', 'core.manual')
         ->call('addStep', 'core.branch')
-        ->assertSee('Employee has role')
+        ->assertSee('Employee has role');
+
+    settingsPanel($editor)
         ->set('settings.condition', 'test.has-role')
         ->assertSeeHtml('settings.condition_settings.role')
-        ->call('applySettings')
-        ->assertHasErrors('settings.condition_settings.role')
-        ->set('settings.condition_settings.role', 'manager')
-        ->call('applySettings')
-        ->assertHasNoErrors()
-        ->call('publish')
+        ->call('apply')
+        ->assertHasErrors('settings.condition_settings.role');
+
+    applySettings($editor, ['condition' => 'test.has-role', 'condition_settings.role' => 'manager'])->assertHasNoErrors();
+
+    $editor->call('publish')
         ->assertSet('errorsList', []);
 
     expect($flow->refresh()->liveVersion->definition['steps'][0]['settings'])->toBe([
@@ -142,10 +144,9 @@ it('picks a condition for a branch in the editor and shows its fields', function
 it('rejects an unknown condition in the editor', function () {
     $flow = Flow::create(['key' => 'onboarding', 'name' => 'Onboarding']);
 
-    Livewire::test(FlowEditor::class, ['flow' => $flow])
+    $editor = Livewire::test(FlowEditor::class, ['flow' => $flow])
         ->call('setTrigger', 'core.manual')
-        ->call('addStep', 'core.branch')
-        ->set('settings.condition', 'core.set-variable')
-        ->call('applySettings')
-        ->assertHasErrors('settings.condition');
+        ->call('addStep', 'core.branch');
+
+    applySettings($editor, ['condition' => 'core.set-variable'])->assertHasErrors('settings.condition');
 });
