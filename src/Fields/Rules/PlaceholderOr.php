@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Validator;
 use MightyMango\Flowkit\Engine\Expression;
 
 /**
- * The editor's check for a Number field: a single `{{ placeholder }}`
- * passes, because it only becomes a number when the flow runs; anything
- * else must pass the numeric rules.
+ * An editor rule for a field that takes variables: a single
+ * `{{ placeholder }}` passes, because it only gets its value when the flow
+ * runs; anything else must pass the field's own rules, which the runner
+ * applies to the resolved value.
  */
-class NumberOrPlaceholder implements ValidationRule
+class PlaceholderOr implements ValidationRule
 {
-    /** @param  list<string>  $rules */
+    /** @param  list<mixed>  $rules */
     public function __construct(private array $rules) {}
 
     public function validate(string $attribute, mixed $value, Closure $fail): void

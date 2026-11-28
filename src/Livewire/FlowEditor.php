@@ -8,6 +8,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use MightyMango\Flowkit\Bricks\BrickRegistry;
 use MightyMango\Flowkit\Bricks\Core\Branch;
+use MightyMango\Flowkit\Bricks\TriggerVariables;
 use MightyMango\Flowkit\Engine\Definition;
 use MightyMango\Flowkit\Exceptions\InvalidDefinition;
 use MightyMango\Flowkit\Fields\SettingsForm;
@@ -129,7 +130,9 @@ class FlowEditor extends Component
             return;
         }
 
-        $validator = SettingsForm::for(app(BrickRegistry::class)->resolve($node['brick']))->validator($settings);
+        $brick = app(BrickRegistry::class)->resolve($node['brick']);
+        $variables = $stepId === 'trigger' ? [] : TriggerVariables::for($this->trigger);
+        $validator = SettingsForm::for($brick, $variables)->validator($settings);
 
         if ($validator->fails()) {
             return;
@@ -205,12 +208,14 @@ class FlowEditor extends Component
     private function summaries(): array
     {
         $registry = app(BrickRegistry::class);
+        $variables = TriggerVariables::for($this->trigger);
         $summaries = [];
 
-        $collect = function (array $nodes) use (&$collect, &$summaries, $registry): void {
+        $collect = function (array $nodes) use (&$collect, &$summaries, $registry, $variables): void {
             foreach ($nodes as $id => $node) {
                 if ($registry->has($node['brick'] ?? '')) {
-                    $summaries[$node['id'] ?? $id] = $registry->resolve($node['brick'])->summary($node['settings'] ?? []);
+                    $summaries[$node['id'] ?? $id] = $registry->resolve($node['brick'])
+                        ->summary($node['settings'] ?? [], $id === 'trigger' ? [] : $variables);
                 }
 
                 foreach ($node['branches'] ?? [] as $children) {

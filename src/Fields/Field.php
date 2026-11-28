@@ -30,6 +30,9 @@ abstract class Field implements Arrayable
 
     protected bool $live = false;
 
+    /** @var list<array{path: string, label: string, type: string|null}> */
+    protected array $availableVariables = [];
+
     final public function __construct(public readonly string $name)
     {
         $this->label = Str::headline($name);
@@ -100,6 +103,28 @@ abstract class Field implements Arrayable
         $this->supportsVariables = true;
 
         return $this;
+    }
+
+    /**
+     * The variables the flow's trigger provides, which the editor passes in
+     * so fields can offer them.
+     *
+     * @param  list<array{path: string, label: string, type: string|null}>  $variables
+     */
+    public function withVariables(array $variables): static
+    {
+        $this->availableVariables = $variables;
+
+        return $this;
+    }
+
+    /**
+     * Extra data about a stored value for the field's component, e.g. the
+     * label of a picked record.
+     */
+    public function present(mixed $value): array
+    {
+        return [];
     }
 
     /** Update the editor as soon as the value changes, e.g. to show dependent fields. */

@@ -19,9 +19,33 @@ class Select extends Field
         return $this;
     }
 
+    /**
+     * The options. A select that asks for a type of variable offers the
+     * trigger's variables of that type, as `{{ placeholder }}` values.
+     */
     public function getOptions(): array
     {
+        if ($this->variableType !== null) {
+            $options = [];
+
+            foreach ($this->availableVariables as $variable) {
+                if ($variable['type'] === $this->variableType) {
+                    $options['{{ '.$variable['path'].' }}'] = $variable['label'];
+                }
+            }
+
+            return $options;
+        }
+
         return $this->options instanceof Closure ? ($this->options)() : $this->options;
+    }
+
+    /** In the editor, a variable select must hold one of its variables. */
+    public function getEditorRules(): array
+    {
+        return $this->variableType === null
+            ? $this->getRules()
+            : [...$this->getRules(), Rule::in(array_keys($this->getOptions()))];
     }
 
     public function component(): string
@@ -41,7 +65,7 @@ class Select extends Field
     /** A fixed option reads as its label. */
     public function summarise(mixed $value): ?string
     {
-        $options = $this->variableType === null ? $this->getOptions() : [];
+        $options = $this->getOptions();
 
         return is_scalar($value) && isset($options[$value]) ? (string) __($options[$value]) : parent::summarise($value);
     }
