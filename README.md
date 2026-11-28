@@ -49,6 +49,19 @@ Flowkit has no tenancy code of its own. It uses the default database connection,
 - **Code-first flows:** save them inside each tenant, e.g. from a tenant migration or `tenants:run`. `Flowkit::define(...)->save()` doesn't publish a new version if the definition hasn't changed, so it's safe to run again.
 - **The editor:** its routes need your tenant middleware. Set `flowkit.routes.middleware`, or set `flowkit.routes.enabled` to false and register the routes yourself.
 
+### Languages
+
+Flowkit ships in English and Welsh, and follows the app's locale (`app()->getLocale()`).
+
+- **Flowkit's own text** (buttons, headings, errors, status names) is in `flowkit::` language files. To change any of it, or add another language, publish them and edit the copies in `lang/vendor/flowkit`:
+
+  ```bash
+  php artisan vendor:publish --tag=flowkit-lang
+  ```
+
+- **Brick and field text** stays as plain English in your PHP classes: labels, groups, descriptions, field labels, placeholders, help and option labels. Flowkit translates it when it shows it, through your app's JSON translations. For example, `lang/cy.json` with `"Send Teams message": "Anfon neges Teams"`. Core bricks' Welsh ships with Flowkit, and your own JSON overrides it.
+- **Validation messages** use the translated field labels as attribute names, and the app's own `validation` translations.
+
 ## Flows
 
 A flow is a trigger plus an ordered list of steps. Branch steps hold named child lists.

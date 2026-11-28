@@ -110,6 +110,15 @@ abstract class Field implements Arrayable
         return $this;
     }
 
+    /**
+     * The label in the app's locale. Labels are plain English, translated on
+     * display: core bricks' through Flowkit's JSON, an app's through its own.
+     */
+    public function getLabel(): string
+    {
+        return (string) __($this->label);
+    }
+
     public function getRules(): array
     {
         return array_merge([$this->required ? 'required' : 'nullable'], $this->baseRules(), $this->rules);
@@ -125,9 +134,9 @@ abstract class Field implements Arrayable
         return [
             'name' => $this->name,
             'component' => $this->component(),
-            'label' => $this->label,
-            'placeholder' => $this->placeholder,
-            'help' => $this->help,
+            'label' => $this->getLabel(),
+            'placeholder' => $this->placeholder === null ? null : __($this->placeholder),
+            'help' => $this->help === null ? null : __($this->help),
             'required' => $this->required,
             'default' => $this->default,
             'supportsVariables' => $this->supportsVariables,

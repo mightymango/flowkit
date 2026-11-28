@@ -1,6 +1,6 @@
 @extends(config('flowkit.layout'))
 
-@section('title', 'Flows')
+@section('title', __('flowkit::editor.flows'))
 
 @section('content')
     <livewire:flowkit.flow-list />

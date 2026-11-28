@@ -10,7 +10,8 @@
         type="button"
         x-on:click="open = ! open"
         class="flex size-8 items-center justify-center rounded-full border border-dashed border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] text-[var(--flowkit-muted)] hover:border-[var(--flowkit-accent)] hover:text-[var(--flowkit-accent)]"
-        title="Add a step"
+        title="{{ __('flowkit::editor.add_step') }}"
+        aria-label="{{ __('flowkit::editor.add_step') }}"
     >+</button>
 
     <div

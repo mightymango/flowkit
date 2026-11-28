@@ -4,7 +4,7 @@
 <div {{ $attributes->class('space-y-1') }}>
     <label for="flowkit-field-{{ $field['name'] }}" class="block text-sm font-medium text-[var(--flowkit-text)]">
         {{ $field['label'] }}
-        @if ($field['required'])<span class="text-[var(--flowkit-danger)]">*</span>@endif
+        @if ($field['required'])<span class="text-[var(--flowkit-danger)]" aria-hidden="true">*</span><span class="sr-only">({{ __('flowkit::editor.required') }})</span>@endif
     </label>
 
     {{ $slot }}
@@ -14,7 +14,7 @@
     @endif
 
     @if ($field['supportsVariables'])
-        <p class="text-xs text-[var(--flowkit-muted)]">Use <code>@{{ variable }}</code> to insert data from earlier steps.</p>
+        <p class="text-xs text-[var(--flowkit-muted)]">{!! __('flowkit::editor.variables_hint', ['placeholder' => '<code>'.e('{{ variable }}').'</code>']) !!}</p>
     @endif
 
     @error('settings.'.$field['name'])

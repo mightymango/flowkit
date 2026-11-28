@@ -83,14 +83,15 @@ class BrickRegistry
     }
 
     /**
-     * Bricks for the editor's picker, grouped by their $group.
+     * Bricks for the editor's picker, grouped by their translated $group.
      */
     public function grouped(?string $type = null): array
     {
         $groups = [];
 
         foreach ($this->all($type) as $class) {
-            $groups[$class::$group][] = $class::meta();
+            $meta = $class::meta();
+            $groups[$meta['group']][] = $meta;
         }
 
         ksort($groups);

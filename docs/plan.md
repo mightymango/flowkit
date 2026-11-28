@@ -260,3 +260,5 @@ AutoBuilder has some ideas worth rebuilding in our own model, each as its own is
 
 If we ever copy AutoBuilder code, we must keep its notice ("Copyright (c) 2025 Jean-Marc Strauven") and the MIT licence text with it.
 
+**Languages: English and Welsh** (#61, 28 Nov 2026). Flowkit is multilingual and ships English and Welsh. Its own interface text is in `flowkit::` PHP language files, which apps override or extend by publishing them to `lang/vendor/flowkit`. Brick and field text stays as plain English in the brick classes and is translated when displayed. Core bricks' Welsh is in the package's JSON, and an app's own bricks use the app's JSON translations, which take precedence. This keeps the brick API unchanged, and lets host apps that must be bilingual (such as mangofolio) switch the editor on.
+

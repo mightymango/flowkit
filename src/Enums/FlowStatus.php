@@ -11,11 +11,6 @@ enum FlowStatus: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::Draft => 'Draft',
-            self::PendingApproval => 'Pending approval',
-            self::Live => 'Live',
-            self::Archived => 'Archived',
-        };
+        return (string) __('flowkit::status.'.$this->value);
     }
 }
