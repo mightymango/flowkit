@@ -10,8 +10,22 @@
     'branch' => null,
 ])
 
+{{--
+    Steps can be dragged by their handle within this list, or into any other
+    list in the flow (the shared `flowkit-steps` group). The editor's
+    handleSort() receives the step id, its new position and this list's id.
+--}}
+@php($listId = $parentId === null ? 'root' : "{$parentId}:{$branch}")
+
 <div {{ $attributes->class('flex flex-col items-center') }}>
+    <div
+        wire:sort="handleSort"
+        wire:sort:group="flowkit-steps"
+        wire:sort:group-id="{{ $listId }}"
+        class="flex min-h-4 flex-col items-center"
+    >
     @foreach ($steps as $step)
+        <div wire:sort:item="{{ $step['id'] }}" wire:key="sortable-{{ $step['id'] }}" class="flex flex-col items-center">
         <x-flowkit::step.connector />
 
         @if (isset($step['branches']))
@@ -34,7 +48,9 @@
                 wire:key="step-{{ $step['id'] }}"
             />
         @endif
+        </div>
     @endforeach
+    </div>
 
     <x-flowkit::step.connector />
     <x-flowkit::step.add-button :bricks="$bricks" :parent-id="$parentId" :branch="$branch" />

@@ -60,6 +60,24 @@
                     :variables="$selectedVariables"
                     :key="'settings-'.$selected.'-'.md5(json_encode([$selectedNode['settings'] ?? [], $selectedVariables]))"
                 />
+
+                @if ($destinations)
+                    <div class="mt-6 space-y-1 border-t border-[var(--flowkit-border)] pt-4">
+                        <label for="flowkit-move-to" class="block text-sm font-medium">{{ __('flowkit::editor.move_to') }}</label>
+                        <select
+                            id="flowkit-move-to"
+                            x-on:change="if ($event.target.value) { $wire.moveTo(@js($selected), $event.target.value); $event.target.value = '' }"
+                            aria-describedby="flowkit-move-to-help"
+                            class="w-full rounded-md border border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] px-3 py-2 text-sm"
+                        >
+                            <option value="">{{ __('flowkit::editor.choose') }}</option>
+                            @foreach ($destinations as $list => $label)
+                                <option value="{{ $list }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <p id="flowkit-move-to-help" class="text-xs text-[var(--flowkit-muted)]">{{ __('flowkit::editor.move_to_help') }}</p>
+                    </div>
+                @endif
             </x-slot:panel>
         @endif
     </x-flowkit::editor.layout>

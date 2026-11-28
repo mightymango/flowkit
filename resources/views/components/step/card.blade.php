@@ -34,7 +34,13 @@
     </button>
 
     @if ($step['id'] !== 'trigger')
-        <div class="absolute right-2 top-2 hidden gap-1 group-hover:flex group-focus-within:flex">
+        <span
+            wire:sort:handle
+            class="absolute left-1 top-1/2 -translate-y-1/2 cursor-grab select-none px-1 text-[var(--flowkit-muted)] opacity-0 group-hover:opacity-100"
+            title="{{ __('flowkit::editor.drag') }}"
+            aria-hidden="true"
+        >⠿</span>
+        <div wire:sort:ignore class="absolute right-2 top-2 hidden gap-1 group-hover:flex group-focus-within:flex">
             <button type="button" wire:click="moveStep('{{ $step['id'] }}', -1)" class="rounded px-1 text-[var(--flowkit-muted)] hover:text-[var(--flowkit-text)]" title="{{ __('flowkit::editor.move_up') }}" aria-label="{{ __('flowkit::editor.move_up') }}">↑</button>
             <button type="button" wire:click="moveStep('{{ $step['id'] }}', 1)" class="rounded px-1 text-[var(--flowkit-muted)] hover:text-[var(--flowkit-text)]" title="{{ __('flowkit::editor.move_down') }}" aria-label="{{ __('flowkit::editor.move_down') }}">↓</button>
             <button type="button" wire:click="removeStep('{{ $step['id'] }}')" wire:confirm="{{ __('flowkit::editor.confirm_delete') }}" class="rounded px-1 text-[var(--flowkit-muted)] hover:text-[var(--flowkit-danger)]" title="{{ __('flowkit::editor.delete') }}" aria-label="{{ __('flowkit::editor.delete') }}">✕</button>
