@@ -10,6 +10,7 @@ use MightyMango\Flowkit\Enums\RunStatus;
 use MightyMango\Flowkit\Jobs\RunFlow;
 use MightyMango\Flowkit\Models\Flow;
 use MightyMango\Flowkit\Models\FlowRun;
+use MightyMango\Flowkit\Models\FlowVersion;
 use RuntimeException;
 
 class Flowkit
@@ -93,6 +94,15 @@ class Flowkit
     }
 
     /**
+     * Test one version, such as the draft being edited, now and in this
+     * process. Always a dry run: an unpublished version never runs for real.
+     */
+    public function testVersion(FlowVersion $version, array $payload = []): FlowRun
+    {
+        return $this->execute($this->createRunOf($version, $payload, dryRun: true));
+    }
+
+    /**
      * Record a pending run of the flow's live version without starting it.
      */
     protected function createRun(Flow|string $flow, array $payload, bool $dryRun): FlowRun
@@ -103,7 +113,14 @@ class Flowkit
             throw new RuntimeException("Flow [{$flow->key}] is not live, or is paused.");
         }
 
-        $version = $flow->liveVersion ?? $flow->latestVersion;
+        return $this->createRunOf($flow->liveVersion ?? $flow->latestVersion, $payload, $dryRun);
+    }
+
+    protected function createRunOf(FlowVersion $version, array $payload, bool $dryRun): FlowRun
+    {
+        if (! $dryRun && ! $version->isPublished()) {
+            throw new RuntimeException("Version {$version->version} isn't published, so it can only be tested.");
+        }
 
         return $version->runs()->create([
             'correlation_id' => (string) Str::uuid(),

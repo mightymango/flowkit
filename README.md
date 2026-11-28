@@ -348,7 +348,7 @@ composer analyse     # Larastan, level 5
 | Phase | Scope | In this scaffold |
 | --- | --- | --- |
 | 1. Engine | Versioned definitions, queue runner, core bricks, code-first flows | ✅ Mostly, including scheduled triggers and the `Flowkit::fake()` and `runFlow()` test helpers. Durable resume after `core.wait` is still to do |
-| 2. Editor | Step-list editor, settings from fields, run history, dry-run testing | 🟡 Editor, settings panel, number, duration and model-picker fields, variable chips, run history (`/flows/{flow}/runs`) and dry runs from code; testing from the editor and `wire:sort` reordering to do |
+| 2. Editor | Step-list editor, settings from fields, run history, dry-run testing | 🟡 Editor, settings panel, number, duration and model-picker fields, variable chips, run history (`/flows/{flow}/runs`) and testing the draft from the editor; `wire:sort` reordering to do |
 | 3. Governance | Approval with diff, audit trail, brick permissions, durable waits | ⬜ Config hooks only |
 | 4. Customisation | `flowkit:publish`, CSS tokens, `flowkit:outdated`, prop docs | 🟡 Publish and tokens; `flowkit:outdated` to do |
 
