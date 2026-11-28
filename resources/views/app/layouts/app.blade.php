@@ -14,9 +14,9 @@
     @livewireStyles
 </head>
 <body class="bg-[var(--flowkit-canvas)] antialiased">
-    <div class="mx-auto max-w-7xl p-6">
+    <main class="mx-auto max-w-7xl p-6">
         @yield('content')
-    </div>
+    </main>
 
     @livewireScripts
 </body>

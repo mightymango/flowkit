@@ -5,12 +5,12 @@
     {{ $header ?? '' }}
 
     <div class="flex flex-1">
-        <main class="flex-1 overflow-auto p-8">
+        <section class="flex-1 overflow-auto p-8" aria-label="{{ __('flowkit::editor.steps') }}">
             {{ $slot }}
-        </main>
+        </section>
 
         @isset($panel)
-            <aside class="w-96 shrink-0 border-l border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] p-6">
+            <aside aria-label="{{ __('flowkit::editor.step_settings') }}" data-flowkit-settings class="w-96 shrink-0 border-l border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] p-6">
                 {{ $panel }}
             </aside>
         @endisset

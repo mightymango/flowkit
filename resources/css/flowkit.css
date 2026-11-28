@@ -12,6 +12,10 @@
  *   @source "../../vendor/mightymango/flowkit/resources/views";
  */
 
+/*
+ * Every text colour meets WCAG 2.2 AA (4.5:1) on the surface and canvas
+ * colours, in light and dark. Check contrast again if you override them.
+ */
 :root {
     --flowkit-accent: #4f46e5;
     --flowkit-accent-contrast: #ffffff;
@@ -21,8 +25,8 @@
     --flowkit-text: #0f172a;
     --flowkit-muted: #64748b;
     --flowkit-danger: #dc2626;
-    --flowkit-success: #16a34a;
-    --flowkit-warning: #d97706;
+    --flowkit-success: #15803d;
+    --flowkit-warning: #b45309;
     --flowkit-radius: 0.75rem;
     --flowkit-card-width: 22rem;
 }
@@ -34,6 +38,11 @@
         --flowkit-border: #334155;
         --flowkit-text: #f1f5f9;
         --flowkit-muted: #94a3b8;
+        --flowkit-accent: #818cf8;
+        --flowkit-accent-contrast: #0f172a;
+        --flowkit-danger: #f87171;
+        --flowkit-success: #4ade80;
+        --flowkit-warning: #fbbf24;
     }
 }
 
@@ -43,4 +52,9 @@
     --flowkit-border: #334155;
     --flowkit-text: #f1f5f9;
     --flowkit-muted: #94a3b8;
+    --flowkit-accent: #818cf8;
+    --flowkit-accent-contrast: #0f172a;
+    --flowkit-danger: #f87171;
+    --flowkit-success: #4ade80;
+    --flowkit-warning: #fbbf24;
 }

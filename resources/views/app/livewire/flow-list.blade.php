@@ -1,4 +1,6 @@
 <div class="space-y-6 text-[var(--flowkit-text)]">
+    <h1 class="text-lg font-semibold">{{ __('flowkit::editor.flows') }}</h1>
+
     <form wire:submit="create" class="flex gap-2">
         <label for="flowkit-new-flow" class="sr-only">{{ __('flowkit::editor.flow_name') }}</label>
         <input

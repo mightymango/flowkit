@@ -20,16 +20,16 @@
 
     <span class="mx-1 h-5 w-px bg-[var(--flowkit-border)]" aria-hidden="true"></span>
 
+    {{-- The saved message's element stays in the DOM so its Alpine state survives Livewire's updates. --}}
     <span role="status" class="text-sm text-[var(--flowkit-muted)]">
+        <span
+            x-data="{ shown: false }"
+            x-on:flowkit-saved.window="shown = true; setTimeout(() => shown = false, 2000)"
+            x-show="shown"
+            x-cloak
+        >{{ __('flowkit::editor.saved') }}</span>
         @if ($dirty)
             <span class="inline-flex items-center gap-1"><span class="size-2 rounded-full bg-[var(--flowkit-warning)]" aria-hidden="true"></span>{{ __('flowkit::editor.unsaved') }}</span>
-        @else
-            <span
-                x-data="{ shown: false }"
-                x-on:flowkit-saved.window="shown = true; setTimeout(() => shown = false, 2000)"
-                x-show="shown"
-                x-cloak
-            >{{ __('flowkit::editor.saved') }}</span>
         @endif
     </span>
 

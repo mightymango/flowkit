@@ -35,10 +35,8 @@
         x-on:click="toggle()"
         x-bind:aria-expanded="open"
         aria-controls="{{ $menuId }}"
-        class="flex size-8 items-center justify-center rounded-full border border-dashed border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] text-[var(--flowkit-muted)] hover:border-[var(--flowkit-accent)] hover:text-[var(--flowkit-accent)]"
-        title="{{ __('flowkit::editor.add_step') }}"
-        aria-label="{{ __('flowkit::editor.add_step') }}"
-    >+</button>
+        class="w-[var(--flowkit-card-width)] max-w-full rounded-[var(--flowkit-radius)] border border-dashed border-[var(--flowkit-border)] bg-[var(--flowkit-surface)] px-4 py-2 text-sm text-[var(--flowkit-muted)] hover:border-[var(--flowkit-accent)] hover:text-[var(--flowkit-accent)]"
+    ><span aria-hidden="true">+</span> {{ __('flowkit::editor.add_step') }}</button>
 
     <div
         id="{{ $menuId }}"

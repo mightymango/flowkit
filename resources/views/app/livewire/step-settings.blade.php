@@ -1,6 +1,6 @@
 <form wire:submit="apply" class="space-y-4" aria-label="{{ __('flowkit::editor.step_settings') }}">
     <div>
-        <h2 class="font-semibold">{{ __($brickClass::$label) }}</h2>
+        <h2 tabindex="-1" class="font-semibold focus:outline-none">{{ __($brickClass::$label) }}</h2>
         @if ($brickClass::$description)
             <p class="mt-1 text-sm text-[var(--flowkit-muted)]">{{ __($brickClass::$description) }}</p>
         @endif
