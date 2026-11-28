@@ -9,6 +9,7 @@
                     x-cloak
                     class="text-sm text-[var(--flowkit-muted)]"
                 >{{ __('flowkit::editor.saved') }}</span>
+                <a href="{{ route('flowkit.runs', $flow) }}" class="text-sm text-[var(--flowkit-muted)] hover:text-[var(--flowkit-text)]">{{ __('flowkit::runs.run_history') }}</a>
                 <x-flowkit::button wire:click="save">{{ __('flowkit::editor.save_draft') }}</x-flowkit::button>
                 <x-flowkit::button variant="primary" wire:click="publish">{{ __('flowkit::editor.publish') }}</x-flowkit::button>
             </x-flowkit::editor.header>

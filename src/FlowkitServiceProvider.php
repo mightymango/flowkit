@@ -18,6 +18,7 @@ use MightyMango\Flowkit\Engine\Expression;
 use MightyMango\Flowkit\Engine\Runner;
 use MightyMango\Flowkit\Livewire\FlowEditor;
 use MightyMango\Flowkit\Livewire\FlowList;
+use MightyMango\Flowkit\Livewire\RunHistory;
 use MightyMango\Flowkit\Livewire\StepSettings;
 
 class FlowkitServiceProvider extends ServiceProvider
@@ -43,6 +44,7 @@ class FlowkitServiceProvider extends ServiceProvider
         'flow-list' => FlowList::class,
         'flow-editor' => FlowEditor::class,
         'step-settings' => StepSettings::class,
+        'run-history' => RunHistory::class,
     ];
 
     public function register(): void

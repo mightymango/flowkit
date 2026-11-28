@@ -5,6 +5,7 @@ namespace MightyMango\Flowkit\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use MightyMango\Flowkit\Engine\Definition;
@@ -41,6 +42,16 @@ class Flow extends Model
     public function versions(): HasMany
     {
         return $this->hasMany(FlowVersion::class)->orderBy('version');
+    }
+
+    /**
+     * Runs of every version of this flow.
+     *
+     * @return HasManyThrough<FlowRun, FlowVersion, $this>
+     */
+    public function runs(): HasManyThrough
+    {
+        return $this->hasManyThrough(FlowRun::class, FlowVersion::class);
     }
 
     /** @return BelongsTo<FlowVersion, $this> */
