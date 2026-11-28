@@ -13,7 +13,9 @@
         <p class="text-xs text-[var(--flowkit-muted)]">{{ $field['help'] }}</p>
     @endif
 
-    @if ($field['supportsVariables'])
+    @if ($field['chips'] ?? [])
+        <x-flowkit::field.variable-chips :for="'flowkit-field-'.$field['name']" :variables="$field['chips']" />
+    @elseif ($field['supportsVariables'])
         <p class="text-xs text-[var(--flowkit-muted)]">{!! __('flowkit::editor.variables_hint', ['placeholder' => '<code>&#123;&#123; variable &#125;&#125;</code>']) !!}</p>
     @endif
 

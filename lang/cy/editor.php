@@ -26,6 +26,7 @@ return [
     'required' => 'gofynnol',
     'variables_hint' => 'Defnyddiwch :placeholder i fewnosod data o gamau cynharach.',
     'duration_placeholder' => 'P7D (7 diwrnod), PT2H (2 awr)',
+    'insert_variable' => 'Mewnosod newidyn',
     'clear_choice' => 'Clirio’r dewis',
     'search_records' => 'Teipiwch i chwilio',
     'no_records' => 'Dim canlyniadau',

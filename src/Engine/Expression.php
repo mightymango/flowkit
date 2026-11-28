@@ -31,6 +31,12 @@ class Expression
         return (bool) $this->evaluate($expression, $context);
     }
 
+    /** The `{{ placeholder }}` for a variable path, as stored in settings. */
+    public static function placeholder(string $path): string
+    {
+        return '{{ '.$path.' }}';
+    }
+
     /**
      * The expression inside a value that is exactly one `{{ placeholder }}`,
      * or null. Such a value takes the evaluated value's type when resolved.

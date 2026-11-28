@@ -64,6 +64,11 @@ class ModelPicker extends Field
         return $this;
     }
 
+    public function insertsVariables(): bool
+    {
+        return false;
+    }
+
     public function component(): string
     {
         return 'flowkit::field.model-picker';

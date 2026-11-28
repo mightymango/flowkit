@@ -39,7 +39,10 @@ class SettingsForm
         $fields = [];
 
         foreach ($this->fieldObjects($settings) as $name => $field) {
-            $fields[] = ['name' => $name] + $field->present(data_get($settings, $name)) + $field->toArray();
+            $fields[] = ['name' => $name]
+                + $field->present(data_get($settings, $name))
+                + ['chips' => $field->insertsVariables() ? $this->variables : []]
+                + $field->toArray();
         }
 
         return $fields;

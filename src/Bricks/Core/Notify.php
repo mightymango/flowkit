@@ -35,6 +35,11 @@ class Notify extends Action
 
     public static bool $retrySafe = false;
 
+    public function outputs(): array
+    {
+        return ['sent' => 'Sent'];
+    }
+
     public function fields(): array
     {
         return [
