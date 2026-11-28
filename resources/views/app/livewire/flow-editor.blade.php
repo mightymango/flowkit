@@ -30,6 +30,7 @@
                 <x-flowkit::step.card
                     :step="['id' => 'trigger'] + $trigger"
                     :label="$labels[$trigger['brick']] ?? $trigger['brick']"
+                    :summary="$summaries['trigger'] ?? null"
                     :selected="$selected === 'trigger'"
                     kind="trigger"
                 />
@@ -46,7 +47,7 @@
             @endif
 
             @if ($trigger)
-                <x-flowkit::step.list :steps="$steps" :labels="$labels" :selected="$selected" :bricks="$stepBricks" />
+                <x-flowkit::step.list :steps="$steps" :labels="$labels" :summaries="$summaries" :selected="$selected" :bricks="$stepBricks" />
             @endif
         </div>
 

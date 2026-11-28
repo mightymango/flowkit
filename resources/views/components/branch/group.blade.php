@@ -2,6 +2,7 @@
 @props([
     'step',
     'labels' => [],
+    'summaries' => [],
     'selected' => null,
     'bricks' => [],
 ])
@@ -10,6 +11,7 @@
     <x-flowkit::step.card
         :step="$step"
         :label="$labels[$step['brick']] ?? $step['brick']"
+        :summary="$summaries[$step['id']] ?? null"
         :selected="$selected === $step['id']"
         kind="branch"
     />
@@ -21,6 +23,7 @@
                 :step-id="$step['id']"
                 :steps="$children"
                 :labels="$labels"
+                :summaries="$summaries"
                 :selected="$selected"
                 :bricks="$bricks"
             />

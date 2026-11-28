@@ -191,8 +191,38 @@ class FlowEditor extends Component
             'triggers' => $registry->grouped('trigger'),
             'stepBricks' => array_merge_recursive($registry->grouped('action'), $registry->grouped('branch'), $registry->grouped('condition')),
             'labels' => array_map(fn ($class) => __($class::$label), $registry->all()),
+            'summaries' => $this->summaries(),
             'selectedNode' => $node && $registry->has($node['brick']) ? $node : null,
         ]);
+    }
+
+    /**
+     * Each step's card summary, keyed by step id (the trigger's under
+     * `trigger`).
+     *
+     * @return array<string, string>
+     */
+    private function summaries(): array
+    {
+        $registry = app(BrickRegistry::class);
+        $summaries = [];
+
+        $collect = function (array $nodes) use (&$collect, &$summaries, $registry): void {
+            foreach ($nodes as $id => $node) {
+                if ($registry->has($node['brick'] ?? '')) {
+                    $summaries[$node['id'] ?? $id] = $registry->resolve($node['brick'])->summary($node['settings'] ?? []);
+                }
+
+                foreach ($node['branches'] ?? [] as $children) {
+                    $collect($children);
+                }
+            }
+        };
+
+        $collect($this->trigger ? ['trigger' => $this->trigger] : []);
+        $collect($this->steps);
+
+        return $summaries;
     }
 
     private function assertBrick(string $key, ?string $type = null): void
